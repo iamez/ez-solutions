@@ -104,9 +104,7 @@ class SecurityMonitoringMiddleware(MiddlewareMixin):
             user_ip = self.get_client_ip(request)
             failed_attempts_key = f"security:failed_login:{user_ip}"
 
-            if response.status_code == 200 and "Please enter a correct" in str(
-                response.content
-            ):
+            if response.status_code == 200 and "Please enter a correct" in str(response.content):
                 # Failed login
                 cache.incr(failed_attempts_key, 1)
                 cache.expire(failed_attempts_key, 3600)  # Expire after 1 hour

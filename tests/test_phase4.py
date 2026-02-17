@@ -120,6 +120,7 @@ class TestTicketListView:
 
     def test_list_does_not_show_other_users_tickets(self, client, user, db):
         from users.models import User
+
         other = User.objects.create_user(email="other@example.com", password="Pass123!")
         Ticket.objects.create(user=other, subject="Other user's ticket", status=TicketStatus.OPEN)
         client.force_login(user)
@@ -148,40 +149,54 @@ class TestTicketCreateView:
 
     def test_create_ticket_success(self, client, user):
         client.force_login(user)
-        resp = client.post(CREATE_URL, {
-            "subject": "New problem",
-            "priority": "normal",
-            "body": "Something is broken.",
-        }, follow=True)
+        resp = client.post(
+            CREATE_URL,
+            {
+                "subject": "New problem",
+                "priority": "normal",
+                "body": "Something is broken.",
+            },
+            follow=True,
+        )
         assert resp.status_code == 200
         assert Ticket.objects.filter(user=user, subject="New problem").exists()
 
     def test_create_also_creates_first_message(self, client, user):
         client.force_login(user)
-        client.post(CREATE_URL, {
-            "subject": "Test ticket",
-            "priority": "low",
-            "body": "Here is my issue description.",
-        })
+        client.post(
+            CREATE_URL,
+            {
+                "subject": "Test ticket",
+                "priority": "low",
+                "body": "Here is my issue description.",
+            },
+        )
         t = Ticket.objects.get(user=user, subject="Test ticket")
         assert t.messages.filter(body="Here is my issue description.").exists()
 
     def test_create_shows_success_message(self, client, user):
         client.force_login(user)
-        resp = client.post(CREATE_URL, {
-            "subject": "Flash test",
-            "priority": "normal",
-            "body": "Testing flash messages.",
-        }, follow=True)
+        resp = client.post(
+            CREATE_URL,
+            {
+                "subject": "Flash test",
+                "priority": "normal",
+                "body": "Testing flash messages.",
+            },
+            follow=True,
+        )
         content = resp.content.decode()
         assert "submitted" in content.lower() or "ticket" in content.lower()
 
     def test_create_invalid_empty_body_rejected(self, client_logged_in):
-        resp = client_logged_in.post(CREATE_URL, {
-            "subject": "No body",
-            "priority": "normal",
-            "body": "",
-        })
+        resp = client_logged_in.post(
+            CREATE_URL,
+            {
+                "subject": "No body",
+                "priority": "normal",
+                "body": "",
+            },
+        )
         assert resp.status_code == 200  # re-renders form
         assert not Ticket.objects.filter(subject="No body").exists()
 
@@ -207,6 +222,7 @@ class TestTicketDetailView:
 
     def test_detail_404_for_other_users_ticket(self, client, db, ticket):
         from users.models import User
+
         other = User.objects.create_user(email="hacker@example.com", password="Pass123!")
         client.force_login(other)
         url = reverse("tickets:detail", kwargs={"pk": ticket.pk})

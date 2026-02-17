@@ -14,8 +14,13 @@ class PlanFeatureInline(admin.TabularInline):
 @admin.register(ServicePlan)
 class ServicePlanAdmin(admin.ModelAdmin):
     list_display = (
-        "name", "price_monthly", "price_annual", "tier_key",
-        "is_active", "is_featured", "sort_order",
+        "name",
+        "price_monthly",
+        "price_annual",
+        "tier_key",
+        "is_active",
+        "is_featured",
+        "sort_order",
     )
     list_editable = ("is_active", "is_featured", "sort_order")
     list_filter = ("is_active", "is_featured", "billing_period")
@@ -23,17 +28,29 @@ class ServicePlanAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [PlanFeatureInline]
     fieldsets = (
-        (None, {
-            "fields": ("name", "slug", "tagline", "description", "tier_key", "sort_order"),
-        }),
-        ("Pricing", {
-            "fields": ("price_monthly", "price_annual", "billing_period"),
-        }),
-        ("Stripe", {
-            "fields": ("stripe_price_id_monthly", "stripe_price_id_annual"),
-            "classes": ("collapse",),
-        }),
-        ("Visibility", {
-            "fields": ("is_active", "is_featured"),
-        }),
+        (
+            None,
+            {
+                "fields": ("name", "slug", "tagline", "description", "tier_key", "sort_order"),
+            },
+        ),
+        (
+            "Pricing",
+            {
+                "fields": ("price_monthly", "price_annual", "billing_period"),
+            },
+        ),
+        (
+            "Stripe",
+            {
+                "fields": ("stripe_price_id_monthly", "stripe_price_id_annual"),
+                "classes": ("collapse",),
+            },
+        ),
+        (
+            "Visibility",
+            {
+                "fields": ("is_active", "is_featured"),
+            },
+        ),
     )

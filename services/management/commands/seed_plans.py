@@ -125,7 +125,5 @@ class Command(BaseCommand):
             )
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"\nDone — {created_count} created, {updated_count} updated."
-            )
+            self.style.SUCCESS(f"\nDone — {created_count} created, {updated_count} updated.")
         )

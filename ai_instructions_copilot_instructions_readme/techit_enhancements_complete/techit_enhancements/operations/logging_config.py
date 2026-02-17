@@ -145,41 +145,41 @@ class JSONFormatter(logging.Formatter):
     JSON formatter for structured logging
     Compatible with ELK stack and log aggregation tools
     """
-    
+
     def format(self, record):
         log_data = {
-            'timestamp': datetime.utcnow().isoformat(),
-            'level': record.levelname,
-            'logger': record.name,
-            'message': record.getMessage(),
-            'module': record.module,
-            'function': record.funcName,
-            'line': record.lineno,
-            'process_id': record.process,
-            'thread_id': record.thread,
+            "timestamp": datetime.utcnow().isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno,
+            "process_id": record.process,
+            "thread_id": record.thread,
         }
-        
+
         # Add extra fields if available
-        if hasattr(record, 'user_id'):
-            log_data['user_id'] = record.user_id
-        
-        if hasattr(record, 'ip_address'):
-            log_data['ip_address'] = record.ip_address
-        
-        if hasattr(record, 'request_id'):
-            log_data['request_id'] = record.request_id
-        
-        if hasattr(record, 'duration'):
-            log_data['duration'] = record.duration
-        
+        if hasattr(record, "user_id"):
+            log_data["user_id"] = record.user_id
+
+        if hasattr(record, "ip_address"):
+            log_data["ip_address"] = record.ip_address
+
+        if hasattr(record, "request_id"):
+            log_data["request_id"] = record.request_id
+
+        if hasattr(record, "duration"):
+            log_data["duration"] = record.duration
+
         # Add exception info if present
         if record.exc_info:
-            log_data['exception'] = {
-                'type': record.exc_info[0].__name__,
-                'message': str(record.exc_info[1]),
-                'traceback': self.formatException(record.exc_info)
+            log_data["exception"] = {
+                "type": record.exc_info[0].__name__,
+                "message": str(record.exc_info[1]),
+                "traceback": self.formatException(record.exc_info),
             }
-        
+
         return json.dumps(log_data)
 
 
@@ -187,121 +187,122 @@ class RequestLoggingMiddleware:
     """
     Middleware to log all requests with performance metrics
     """
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-        self.logger = logging.getLogger('performance')
-    
+        self.logger = logging.getLogger("performance")
+
     def __call__(self, request):
         import time
-        
+
         # Record start time
         start_time = time.time()
-        
+
         # Get request ID (or generate one)
-        request_id = request.META.get('HTTP_X_REQUEST_ID', self.generate_request_id())
-        
+        request_id = request.META.get("HTTP_X_REQUEST_ID", self.generate_request_id())
+
         # Process request
         response = self.get_response(request)
-        
+
         # Calculate duration
         duration = time.time() - start_time
-        
+
         # Log request
         log_data = {
-            'request_id': request_id,
-            'method': request.method,
-            'path': request.path,
-            'status_code': response.status_code,
-            'duration': f'{duration:.3f}s',
-            'user_id': request.user.id if request.user.is_authenticated else None,
-            'ip_address': self.get_client_ip(request),
-            'user_agent': request.META.get('HTTP_USER_AGENT', ''),
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.path,
+            "status_code": response.status_code,
+            "duration": f"{duration:.3f}s",
+            "user_id": request.user.id if request.user.is_authenticated else None,
+            "ip_address": self.get_client_ip(request),
+            "user_agent": request.META.get("HTTP_USER_AGENT", ""),
         }
-        
+
         # Determine log level based on status code
         if response.status_code >= 500:
-            self.logger.error('Request completed', extra=log_data)
+            self.logger.error("Request completed", extra=log_data)
         elif response.status_code >= 400:
-            self.logger.warning('Request completed', extra=log_data)
+            self.logger.warning("Request completed", extra=log_data)
         else:
-            self.logger.info('Request completed', extra=log_data)
-        
+            self.logger.info("Request completed", extra=log_data)
+
         return response
-    
+
     @staticmethod
     def generate_request_id():
         """Generate unique request ID"""
         import uuid
+
         return str(uuid.uuid4())
-    
+
     @staticmethod
     def get_client_ip(request):
         """Get real client IP"""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
-            return x_forwarded_for.split(',')[0].strip()
-        return request.META.get('REMOTE_ADDR')
+            return x_forwarded_for.split(",")[0].strip()
+        return request.META.get("REMOTE_ADDR")
 
 
 class SecurityLogger:
     """
     Utility class for security-related logging
     """
-    
+
     def __init__(self):
-        self.logger = logging.getLogger('security')
-    
-    def log_failed_login(self, username, ip_address, reason='Invalid credentials'):
+        self.logger = logging.getLogger("security")
+
+    def log_failed_login(self, username, ip_address, reason="Invalid credentials"):
         """Log failed login attempt"""
         self.logger.warning(
-            f'Failed login attempt',
+            f"Failed login attempt",
             extra={
-                'event': 'failed_login',
-                'username': username,
-                'ip_address': ip_address,
-                'reason': reason,
-            }
+                "event": "failed_login",
+                "username": username,
+                "ip_address": ip_address,
+                "reason": reason,
+            },
         )
-    
+
     def log_suspicious_activity(self, user_id, activity, ip_address, details=None):
         """Log suspicious activity"""
         extra = {
-            'event': 'suspicious_activity',
-            'user_id': user_id,
-            'activity': activity,
-            'ip_address': ip_address,
+            "event": "suspicious_activity",
+            "user_id": user_id,
+            "activity": activity,
+            "ip_address": ip_address,
         }
-        
+
         if details:
-            extra['details'] = details
-        
-        self.logger.warning(f'Suspicious activity detected', extra=extra)
-    
+            extra["details"] = details
+
+        self.logger.warning(f"Suspicious activity detected", extra=extra)
+
     def log_permission_denied(self, user_id, resource, action, ip_address):
         """Log permission denied"""
         self.logger.warning(
-            f'Permission denied',
+            f"Permission denied",
             extra={
-                'event': 'permission_denied',
-                'user_id': user_id,
-                'resource': resource,
-                'action': action,
-                'ip_address': ip_address,
-            }
+                "event": "permission_denied",
+                "user_id": user_id,
+                "resource": resource,
+                "action": action,
+                "ip_address": ip_address,
+            },
         )
-    
+
     def log_data_access(self, user_id, resource_type, resource_id, action):
         """Log sensitive data access"""
         self.logger.info(
-            f'Data access',
+            f"Data access",
             extra={
-                'event': 'data_access',
-                'user_id': user_id,
-                'resource_type': resource_type,
-                'resource_id': resource_id,
-                'action': action,
-            }
+                "event": "data_access",
+                "user_id": user_id,
+                "resource_type": resource_type,
+                "resource_id": resource_id,
+                "action": action,
+            },
         )
 
 
@@ -309,44 +310,44 @@ class PerformanceLogger:
     """
     Utility class for performance monitoring
     """
-    
+
     def __init__(self):
-        self.logger = logging.getLogger('performance')
-    
+        self.logger = logging.getLogger("performance")
+
     def log_slow_query(self, query, duration, params=None):
         """Log slow database query"""
         self.logger.warning(
-            f'Slow query detected',
+            f"Slow query detected",
             extra={
-                'event': 'slow_query',
-                'query': query[:200],  # Truncate long queries
-                'duration': duration,
-                'params': params,
-            }
+                "event": "slow_query",
+                "query": query[:200],  # Truncate long queries
+                "duration": duration,
+                "params": params,
+            },
         )
-    
-    def log_api_call(self, endpoint, duration, status_code, method='GET'):
+
+    def log_api_call(self, endpoint, duration, status_code, method="GET"):
         """Log API call performance"""
         self.logger.info(
-            f'API call',
+            f"API call",
             extra={
-                'event': 'api_call',
-                'endpoint': endpoint,
-                'method': method,
-                'duration': duration,
-                'status_code': status_code,
-            }
+                "event": "api_call",
+                "endpoint": endpoint,
+                "method": method,
+                "duration": duration,
+                "status_code": status_code,
+            },
         )
-    
+
     def log_cache_hit(self, cache_key, hit=True):
         """Log cache hit/miss"""
         self.logger.debug(
             f'Cache {"hit" if hit else "miss"}',
             extra={
-                'event': 'cache_access',
-                'cache_key': cache_key,
-                'hit': hit,
-            }
+                "event": "cache_access",
+                "cache_key": cache_key,
+                "hit": hit,
+            },
         )
 
 

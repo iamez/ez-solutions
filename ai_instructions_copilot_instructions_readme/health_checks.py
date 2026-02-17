@@ -57,14 +57,10 @@ class DetailedHealthCheckView(View):
         health_status["checks"]["cpu"] = cpu_status
 
         # Determine overall status
-        if any(
-            check["status"] == "unhealthy" for check in health_status["checks"].values()
-        ):
+        if any(check["status"] == "unhealthy" for check in health_status["checks"].values()):
             health_status["status"] = "unhealthy"
             status_code = 503
-        elif any(
-            check["status"] == "degraded" for check in health_status["checks"].values()
-        ):
+        elif any(check["status"] == "degraded" for check in health_status["checks"].values()):
             health_status["status"] = "degraded"
             status_code = 200
         else:
@@ -193,9 +189,7 @@ class ReadinessCheckView(View):
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
 
-            return JsonResponse(
-                {"status": "ready", "message": "Application is ready"}, status=200
-            )
+            return JsonResponse({"status": "ready", "message": "Application is ready"}, status=200)
 
         except Exception as e:
             return JsonResponse({"status": "not_ready", "message": str(e)}, status=503)

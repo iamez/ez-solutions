@@ -73,8 +73,12 @@ def ticket_detail(request, pk):
             return redirect("tickets:detail", pk=pk)
 
     thread = ticket.messages.select_related("sender").all()
-    return render(request, "tickets/ticket_detail.html", {
-        "ticket": ticket,
-        "thread": thread,
-        "reply_form": reply_form,
-    })
+    return render(
+        request,
+        "tickets/ticket_detail.html",
+        {
+            "ticket": ticket,
+            "thread": thread,
+            "reply_form": reply_form,
+        },
+    )

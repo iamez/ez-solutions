@@ -77,13 +77,15 @@ class TestSubscriptionModel:
         assert active_subscription.is_active is True
 
     def test_is_active_false_for_canceled(self, customer):
-        sub = Subscription(customer=customer, status=SubscriptionStatus.CANCELED,
-                          stripe_subscription_id="sub_x")
+        sub = Subscription(
+            customer=customer, status=SubscriptionStatus.CANCELED, stripe_subscription_id="sub_x"
+        )
         assert sub.is_active is False
 
     def test_is_past_due(self, customer):
-        sub = Subscription(customer=customer, status=SubscriptionStatus.PAST_DUE,
-                          stripe_subscription_id="sub_y")
+        sub = Subscription(
+            customer=customer, status=SubscriptionStatus.PAST_DUE, stripe_subscription_id="sub_y"
+        )
         assert sub.is_past_due is True
 
     def test_days_until_renewal(self, active_subscription):
@@ -92,8 +94,12 @@ class TestSubscriptionModel:
         assert 28 <= days <= 31
 
     def test_days_until_renewal_none_when_no_end_date(self, customer):
-        sub = Subscription(customer=customer, status=SubscriptionStatus.ACTIVE,
-                          stripe_subscription_id="sub_z", current_period_end=None)
+        sub = Subscription(
+            customer=customer,
+            status=SubscriptionStatus.ACTIVE,
+            stripe_subscription_id="sub_z",
+            current_period_end=None,
+        )
         assert sub.days_until_renewal is None
 
     def test_str(self, active_subscription):
@@ -113,6 +119,7 @@ class TestPaymentEventModel:
 
     def test_unique_stripe_event_id(self, db):
         from django.db import IntegrityError
+
         PaymentEvent.objects.create(
             stripe_event_id="evt_unique_001",
             event_type="test",
@@ -169,10 +176,7 @@ class TestCheckoutView:
         assert resp.status_code == 200
         # Should redirect to pricing page with error message
         pricing_url = reverse("services:pricing")
-        assert (
-            b"not yet available" in resp.content
-            or resp.wsgi_request.path == pricing_url
-        )
+        assert b"not yet available" in resp.content or resp.wsgi_request.path == pricing_url
 
     def test_checkout_404_for_inactive_plan(self, client_logged_in, plan):
         plan.is_active = False
@@ -183,11 +187,12 @@ class TestCheckoutView:
 
     @patch("orders.views.stripe.checkout.Session.create")
     @patch("orders.views.stripe.Customer.create")
-    def test_checkout_redirects_to_stripe(self, mock_stripe_customer, mock_session_create,
-                                          client_logged_in, plan):
+    def test_checkout_redirects_to_stripe(
+        self, mock_stripe_customer, mock_session_create, client_logged_in, plan
+    ):
         mock_stripe_customer.return_value = MagicMock(id="cus_new_123")
-        mock_stripe_customer.return_value.__getitem__ = (
-            lambda self, key: "cus_new_123" if key == "id" else None
+        mock_stripe_customer.return_value.__getitem__ = lambda self, key: (
+            "cus_new_123" if key == "id" else None
         )
         mock_session_create.return_value = MagicMock(url="https://checkout.stripe.com/session/xyz")
 
