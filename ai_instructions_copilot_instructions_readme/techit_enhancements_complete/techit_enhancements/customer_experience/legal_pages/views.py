@@ -9,27 +9,32 @@ from django.views.generic import TemplateView
 
 class TermsOfServiceView(TemplateView):
     """Terms of Service page"""
-    template_name = 'legal/terms_of_service.html'
+
+    template_name = "legal/terms_of_service.html"
 
 
 class PrivacyPolicyView(TemplateView):
     """Privacy Policy page"""
-    template_name = 'legal/privacy_policy.html'
+
+    template_name = "legal/privacy_policy.html"
 
 
 class CookiePolicyView(TemplateView):
     """Cookie Policy page"""
-    template_name = 'legal/cookie_policy.html'
+
+    template_name = "legal/cookie_policy.html"
 
 
 class AcceptableUsePolicyView(TemplateView):
     """Acceptable Use Policy page"""
-    template_name = 'legal/acceptable_use.html'
+
+    template_name = "legal/acceptable_use.html"
 
 
 class SLAView(TemplateView):
     """Service Level Agreement page"""
-    template_name = 'legal/sla.html'
+
+    template_name = "legal/sla.html"
 
 
 # URLs configuration

@@ -95,9 +95,7 @@ class InvoiceTests(TestCase):
 
     def test_invoice_creation(self):
         """Test creating an invoice"""
-        invoice = Invoice.objects.create(
-            order=self.order, amount=Decimal("9.99"), status="unpaid"
-        )
+        invoice = Invoice.objects.create(order=self.order, amount=Decimal("9.99"), status="unpaid")
         self.assertEqual(invoice.amount, Decimal("9.99"))
         self.assertEqual(invoice.status, "unpaid")
 
@@ -225,9 +223,7 @@ class OrderViewTests(TestCase):
         other_user = User.objects.create_user(
             username="other", email="other@example.com", password="TestPass123!"
         )
-        Order.objects.create(
-            user=other_user, service_plan=self.plan, total_amount=Decimal("9.99")
-        )
+        Order.objects.create(user=other_user, service_plan=self.plan, total_amount=Decimal("9.99"))
         my_order = Order.objects.create(
             user=self.user, service_plan=self.plan, total_amount=Decimal("19.99")
         )

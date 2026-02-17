@@ -15,8 +15,14 @@ class TicketMessageInline(admin.TabularInline):
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
     list_display = (
-        "reference_short", "subject", "user", "status", "priority",
-        "message_count", "created_at", "updated_at",
+        "reference_short",
+        "subject",
+        "user",
+        "status",
+        "priority",
+        "message_count",
+        "created_at",
+        "updated_at",
     )
     list_filter = ("status", "priority")
     search_fields = ("subject", "user__email", "reference")

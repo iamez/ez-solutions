@@ -9,8 +9,11 @@ class SubscriptionInline(admin.TabularInline):
     model = Subscription
     extra = 0
     readonly_fields = (
-        "stripe_subscription_id", "stripe_price_id",
-        "status", "current_period_end", "created_at",
+        "stripe_subscription_id",
+        "stripe_price_id",
+        "status",
+        "current_period_end",
+        "created_at",
     )
     can_delete = False
 
@@ -26,8 +29,12 @@ class CustomerAdmin(admin.ModelAdmin):
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = (
-        "stripe_subscription_id", "get_user_email", "status",
-        "current_period_end", "cancel_at_period_end", "updated_at",
+        "stripe_subscription_id",
+        "get_user_email",
+        "status",
+        "current_period_end",
+        "cancel_at_period_end",
+        "updated_at",
     )
     list_filter = ("status", "cancel_at_period_end")
     search_fields = ("stripe_subscription_id", "customer__user__email")

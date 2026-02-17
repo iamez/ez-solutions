@@ -121,9 +121,7 @@ class PricingTests(TestCase):
     """Test pricing calculations"""
 
     def setUp(self):
-        self.service = Service.objects.create(
-            name="VPS", slug="vps", service_type="vps"
-        )
+        self.service = Service.objects.create(name="VPS", slug="vps", service_type="vps")
 
     def test_monthly_pricing(self):
         """Test monthly pricing"""

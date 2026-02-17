@@ -50,9 +50,7 @@ class UserRegistrationTests(TestCase):
             "password2": "TestPass123!",
         }
         response = self.client.post(self.register_url, data)
-        self.assertFormError(
-            response, "form", "email", "User with this Email already exists."
-        )
+        self.assertFormError(response, "form", "email", "User with this Email already exists.")
 
     def test_password_mismatch(self):
         """Test that password mismatch is caught"""
@@ -63,9 +61,7 @@ class UserRegistrationTests(TestCase):
             "password2": "DifferentPass123!",
         }
         response = self.client.post(self.register_url, data)
-        self.assertFormError(
-            response, "form", "password2", "The two password fields didn't match."
-        )
+        self.assertFormError(response, "form", "password2", "The two password fields didn't match.")
 
 
 class UserLoginTests(TestCase):

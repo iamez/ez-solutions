@@ -5,30 +5,30 @@ python-decouple==3.8
 
 # REST API
 djangorestframework==3.15.2
-django-cors-headers==4.7.0
+django-cors-headers==4.9.0
 
 # Stripe billing
 stripe==11.5.0
 
 # Async tasks
 celery==5.4.0
-django-celery-beat==2.7.0
+django-celery-beat==2.8.1
 redis==5.2.1
 
 # Email
-django-anymail[mailgun]==12.0
+django-anymail[mailgun]==14.0
 
 # Storage (prod)
-django-storages==1.14.5
+django-storages==1.14.6
 boto3==1.36.21
 
 # Auth
-django-allauth==65.5.0
+django-allauth==65.14.3
 
 # Utilities
-Pillow==11.1.0
+Pillow==12.1.1
 whitenoise==6.9.0
 gunicorn==23.0.0
 
 # Monitoring
-sentry-sdk[django]==2.24.0
+sentry-sdk[django]==2.53.0
