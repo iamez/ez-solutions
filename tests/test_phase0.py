@@ -53,6 +53,18 @@ class TestUserModel:
         with pytest.raises(IntegrityError):
             User.objects.create_user(email="dup@test.com", password="Other123!")
 
+    def test_create_superuser_is_staff_false_raises(self, db):
+        with pytest.raises(ValueError, match="is_staff"):
+            User.objects.create_superuser(
+                email="bad_su@test.com", password="Pass123!", is_staff=False
+            )
+
+    def test_create_superuser_is_superuser_false_raises(self, db):
+        with pytest.raises(ValueError, match="is_superuser"):
+            User.objects.create_superuser(
+                email="bad_su2@test.com", password="Pass123!", is_superuser=False
+            )
+
 
 # ---------------------------------------------------------------------------
 # URL smoke tests

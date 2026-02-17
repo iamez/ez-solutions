@@ -36,5 +36,3 @@ if SENTRY_DSN:  # noqa: F405
         traces_sample_rate=0.2,
         send_default_pii=False,
     )
-
-from decouple import Csv, config  # noqa: E402, F401
