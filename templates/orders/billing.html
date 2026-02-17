@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing — Tech-IT Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-8">
+
+      <!-- Page header -->
+      <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'users:dashboard' %}" class="btn btn-sm btn-outline-secondary me-3">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+          <h2 class="fw-bold mb-0">Billing &amp; Subscription</h2>
+          <p class="text-muted mb-0 small">Manage your plan and payment details</p>
+        </div>
+      </div>
+
+      <!-- Success message after checkout -->
+      {% if request.GET.checkout == "success" %}
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <strong>Welcome aboard!</strong> Your subscription is now active. It may take a moment to update.
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endif %}
+
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+
+      <!-- Current plan card -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge-fill text-primary me-2"></i>Current Plan</h5>
+
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+              <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 fs-6">
+                {{ request.user.get_subscription_tier_display }}
+              </span>
+              {% if subscription %}
+                <p class="text-muted small mt-2 mb-0">
+                  Status:
+                  {% if subscription.is_active %}
+                    <span class="text-success fw-semibold">Active</span>
+                  {% elif subscription.is_past_due %}
+                    <span class="text-warning fw-semibold">Past Due — please update your payment method</span>
+                  {% else %}
+                    <span class="text-danger fw-semibold">{{ subscription.get_status_display }}</span>
+                  {% endif %}
+                </p>
+                {% if subscription.current_period_end %}
+                  <p class="text-muted small mb-0">
+                    {% if subscription.cancel_at_period_end %}
+                      Cancels on {{ subscription.current_period_end|date:"N j, Y" }}
+                    {% else %}
+                      Renews on {{ subscription.current_period_end|date:"N j, Y" }}
+                      ({{ subscription.days_until_renewal }} day{{ subscription.days_until_renewal|pluralize }} away)
+                    {% endif %}
+                  </p>
+                {% endif %}
+              {% else %}
+                <p class="text-muted small mt-2 mb-0">You are on the free tier.</p>
+              {% endif %}
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+              {% if subscription %}
+                <a href="{% url 'orders:billing_portal' %}" class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-gear me-1"></i>Manage Subscription
+                </a>
+              {% endif %}
+              <a href="{% url 'services:pricing' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-up-circle me-1"></i>
+                {% if request.user.is_paid %}Change Plan{% else %}Upgrade{% endif %}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment method / portal -->
+      {% if subscription %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-credit-card me-2 text-muted"></i>Payment Method</h5>
+                <p class="text-muted small mb-0">Managed securely via Stripe</p>
+              </div>
+              <a href="{% url 'orders:billing_portal' %}" class="btn btn-outline-secondary btn-sm">
+                Update <i class="bi bi-box-arrow-up-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- No subscription yet -->
+      {% if not subscription and not request.user.is_paid %}
+        <div class="card border-0 bg-primary-subtle rounded-4 p-4 text-center">
+          <i class="bi bi-rocket-takeoff fs-1 text-primary mb-3 d-block"></i>
+          <h5 class="fw-bold">Ready to unlock more?</h5>
+          <p class="text-muted mb-3">Choose a plan and get started in minutes — no credit card needed for the trial.</p>
+          <a href="{% url 'services:pricing' %}" class="btn btn-primary fw-semibold px-4">View Plans</a>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

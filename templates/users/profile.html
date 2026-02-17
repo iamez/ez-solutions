@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile — Tech-IT Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+
+      <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'users:dashboard' %}" class="btn btn-sm btn-outline-secondary me-3">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <h2 class="fw-bold mb-0">My Profile</h2>
+      </div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Account info -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-person-circle me-2 text-primary"></i>Account Info</h5>
+          <div class="mb-2 text-muted small">
+            <strong>Email:</strong> {{ user.email }}
+            <span class="badge bg-secondary ms-2">{{ user.get_subscription_tier_display|title }}</span>
+          </div>
+          <div class="text-muted small">
+            <strong>Member since:</strong> {{ user.date_joined|date:"N j, Y" }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit name form -->
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i>Update Name</h5>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="id_first_name" class="form-label fw-semibold">First name</label>
+              {{ form.first_name }}
+            </div>
+            <div class="mb-3">
+              <label for="id_last_name" class="form-label fw-semibold">Last name</label>
+              {{ form.last_name }}
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+              <a href="{% url 'account_change_password' %}" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-key me-1"></i>Change Password
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

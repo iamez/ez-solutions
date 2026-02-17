@@ -1,0 +1,107 @@
+:root {
+	--primary-color: #2563eb;
+	--secondary-color: #10b981;
+	--dark-bg: #0f172a;
+	--light-bg: #f8fafc;
+}
+
+body {
+	background: var(--light-bg);
+	color: #0f172a;
+	font-family: 'Inter', sans-serif;
+}
+
+.hero-section {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+}
+
+.service-card {
+	border-radius: 16px;
+	box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.service-card:hover {
+	transform: translateY(-8px);
+	box-shadow: 0 16px 48px rgba(37,99,235,0.15);
+	border-top: 4px solid var(--primary-color);
+}
+.service-icon {
+	font-size: 2.5rem;
+	background: linear-gradient(135deg, #2563eb, #10b981);
+	color: #fff;
+	border-radius: 50%;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.pricing-card {
+	border-radius: 16px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+	border: 2px solid #e2e8f0;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.pricing-card:hover {
+	transform: scale(1.03);
+	box-shadow: 0 8px 24px rgba(37,99,235,0.10);
+	border-color: var(--primary-color);
+}
+
+.testimonial-card {
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+	background: #fff;
+	border: 1px solid #e2e8f0;
+}
+
+.stat-card {
+	border-radius: 12px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	font-weight: 600;
+	display: inline-block;
+}
+
+.btn-primary {
+	background: var(--primary-color);
+	border-radius: 8px;
+	font-weight: 600;
+	box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+	transition: transform 0.3s ease;
+}
+.btn-primary:hover {
+	transform: translateY(-2px);
+	background: linear-gradient(135deg, #2563eb, #10b981);
+}
+.btn-outline-primary {
+	border: 2px solid var(--primary-color);
+	color: var(--primary-color);
+	background: transparent;
+	border-radius: 8px;
+	font-weight: 600;
+	transition: background 0.3s ease, color 0.3s ease;
+}
+.btn-outline-primary:hover {
+	background: var(--primary-color);
+	color: #fff;
+}
+
+.footer {
+	background: var(--dark-bg);
+	color: #f8fafc;
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
+}
+
+@media (max-width: 767px) {
+	.hero-section h1 {
+		font-size: 2.5rem;
+	}
+	.service-card, .pricing-card, .testimonial-card {
+		padding: 1.5rem;
+	}
+	.main-content {
+		padding: 1rem;
+	}
+}

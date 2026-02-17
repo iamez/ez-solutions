@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing — Tech-IT Solutions{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="py-5 text-center" style="background: linear-gradient(135deg, #1a56db 0%, #0e4bbd 100%); color: white;">
+  <div class="container">
+    <span class="badge bg-white text-primary fw-semibold mb-3 px-3 py-2">Simple, transparent pricing</span>
+    <h1 class="display-5 fw-bold mb-3">Choose the plan that fits your business</h1>
+    <p class="lead mb-0" style="opacity: .9;">All plans include a 14-day free trial — no credit card required.</p>
+  </div>
+</section>
+
+<!-- Plans -->
+<section class="py-5">
+  <div class="container">
+    {% if plans %}
+      <div class="row g-4 justify-content-center">
+        {% for plan in plans %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4{% if plan.is_featured %} border-primary border-2{% endif %}" style="{% if plan.is_featured %}border: 2px solid #1a56db !important;{% endif %}">
+              {% if plan.is_featured %}
+                <div class="card-header text-center bg-primary text-white rounded-top-4 py-2 border-0">
+                  <span class="fw-semibold small"><i class="bi bi-star-fill me-1"></i>Most Popular</span>
+                </div>
+              {% endif %}
+              <div class="card-body p-4 d-flex flex-column">
+                <!-- Plan name & tagline -->
+                <h3 class="fw-bold mb-1">{{ plan.name }}</h3>
+                {% if plan.tagline %}
+                  <p class="text-muted small mb-3">{{ plan.tagline }}</p>
+                {% endif %}
+
+                <!-- Price -->
+                <div class="mb-4">
+                  <span class="display-6 fw-bold">${{ plan.price_monthly }}</span>
+                  <span class="text-muted">/mo</span>
+                  {% if plan.annual_savings %}
+                    <div class="mt-1">
+                      <span class="badge bg-success-subtle text-success">{{ plan.annual_savings }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Features -->
+                <ul class="list-unstyled mb-4 flex-grow-1">
+                  {% for feature in plan.features.all %}
+                    <li class="mb-2 d-flex align-items-center gap-2">
+                      {% if feature.is_included %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                      {% else %}
+                        <i class="bi bi-x-circle text-muted"></i>
+                      {% endif %}
+                      <span class="{% if not feature.is_included %}text-muted{% endif %}">{{ feature.text }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+
+                <!-- CTA -->
+                {% if user.is_authenticated %}
+                  <a href="{% url 'orders:checkout' plan.slug %}"
+                     class="btn btn-{% if plan.is_featured %}primary{% else %}outline-primary{% endif %} w-100 fw-semibold">
+                    Get Started
+                  </a>
+                {% else %}
+                  <a href="{% url 'account_signup' %}" class="btn btn-{% if plan.is_featured %}primary{% else %}outline-primary{% endif %} w-100 fw-semibold">
+                    Start Free Trial
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- FAQ teaser -->
+      <div class="text-center mt-5">
+        <p class="text-muted">
+          Questions? <a href="{% url 'home:index' %}" class="text-primary fw-semibold">Contact us</a>
+          — we're happy to help you find the right plan.
+        </p>
+      </div>
+
+    {% else %}
+      <!-- No plans in DB yet -->
+      <div class="text-center py-5">
+        <i class="bi bi-grid-3x3-gap fs-1 text-muted mb-3 d-block"></i>
+        <h3 class="fw-bold text-muted">Plans coming soon</h3>
+        <p class="text-muted">We're finalising our pricing. <a href="{% url 'home:index' %}">Get in touch</a> for early access.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

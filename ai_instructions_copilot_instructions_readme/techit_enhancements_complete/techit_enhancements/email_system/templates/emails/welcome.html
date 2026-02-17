@@ -1,0 +1,43 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Welcome to Tech-IT Solutions!{% endblock %}
+
+{% block header %}
+<h2 style="color: #0066cc; margin: 10px 0;">Welcome Aboard!</h2>
+{% endblock %}
+
+{% block content %}
+<p>Hi {{ user.first_name|default:user.username }},</p>
+
+<p>Welcome to <strong>Tech-IT Solutions</strong>! We're excited to have you as part of our community.</p>
+
+<p>Your account has been successfully created, and you now have access to our full range of services including:</p>
+
+<ul>
+    <li>🌐 <strong>Web Hosting</strong> - Fast, reliable hosting for your websites</li>
+    <li>💻 <strong>VPS Solutions</strong> - Powerful virtual private servers</li>
+    <li>🔗 <strong>Domain Registration</strong> - Secure your perfect domain name</li>
+    <li>🛠️ <strong>IT Consulting</strong> - Expert technical support when you need it</li>
+</ul>
+
+<div class="info-box">
+    <strong>Getting Started:</strong><br>
+    1. Log in to your dashboard<br>
+    2. Browse our services<br>
+    3. Configure your first service<br>
+    4. We're here to help 24/7!
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ dashboard_url }}" class="button">Go to Dashboard</a>
+</div>
+
+<p>If you have any questions or need assistance, our support team is always ready to help at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+
+<p>Thank you for choosing Tech-IT Solutions!</p>
+
+<p>
+Best regards,<br>
+<strong>The Tech-IT Solutions Team</strong>
+</p>
+{% endblock %}

@@ -1,0 +1,18 @@
+-r base.txt
+
+# Testing
+pytest==8.3.5
+pytest-django==4.9.0
+pytest-cov==6.0.0
+factory-boy==3.3.3
+faker==33.3.1
+responses==0.25.6
+
+# Code quality
+ruff==0.9.9
+black==25.1.0
+pre-commit==4.2.0
+
+# Debugging
+django-debug-toolbar==5.1.0
+ipython==8.32.0

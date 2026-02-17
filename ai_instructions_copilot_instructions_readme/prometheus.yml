@@ -1,0 +1,49 @@
+# Prometheus Configuration for Tech-IT Solutions
+# Save as: prometheus.yml
+
+global:
+  scrape_interval: 15s  # Scrape metrics every 15 seconds
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+  external_labels:
+    cluster: 'techit-production'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'localhost:9093'
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - 'alert_rules.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Django application metrics
+  - job_name: 'django-app'
+    static_configs:
+      - targets: ['localhost:8000']
+    metrics_path: '/health/metrics/'
+    scrape_interval: 30s
+
+  # Node exporter (system metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+
+  # PostgreSQL exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['localhost:9187']
+
+  # Nginx exporter
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['localhost:9113']
+
+  # Redis exporter (if using Redis)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']

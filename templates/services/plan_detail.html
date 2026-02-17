@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ plan.name }} — Tech-IT Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <!-- Back link -->
+      <a href="{% url 'services:pricing' %}" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1 mb-4">
+        <i class="bi bi-arrow-left"></i> All Plans
+      </a>
+
+      <div class="card border-0 shadow-sm rounded-4 p-4">
+        <h1 class="fw-bold mb-1">{{ plan.name }}</h1>
+        {% if plan.tagline %}
+          <p class="text-muted mb-4">{{ plan.tagline }}</p>
+        {% endif %}
+
+        <div class="mb-4">
+          <span class="display-5 fw-bold">${{ plan.price_monthly }}</span>
+          <span class="text-muted">/month</span>
+        </div>
+
+        {% if plan.description %}
+          <p class="mb-4">{{ plan.description }}</p>
+        {% endif %}
+
+        <h5 class="fw-semibold mb-3">What's included</h5>
+        <ul class="list-unstyled mb-4">
+          {% for feature in plan.features.all %}
+            <li class="mb-2 d-flex align-items-center gap-2">
+              {% if feature.is_included %}
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span>{{ feature.text }}</span>
+              {% else %}
+                <i class="bi bi-x-circle text-muted"></i>
+                <span class="text-muted">{{ feature.text }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+
+        {% if user.is_authenticated %}
+          <a href="{% url 'orders:checkout' plan.slug %}" class="btn btn-primary btn-lg fw-semibold w-100">Choose {{ plan.name }}</a>
+        {% else %}
+          <a href="{% url 'account_signup' %}" class="btn btn-primary btn-lg fw-semibold w-100">Start Free Trial</a>
+          <p class="text-center text-muted small mt-2">No credit card required · 14-day free trial</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

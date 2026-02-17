@@ -1,0 +1,49 @@
+"""Admin registration for billing / orders."""
+
+from django.contrib import admin
+
+from .models import Customer, PaymentEvent, Subscription
+
+
+class SubscriptionInline(admin.TabularInline):
+    model = Subscription
+    extra = 0
+    readonly_fields = (
+        "stripe_subscription_id", "stripe_price_id",
+        "status", "current_period_end", "created_at",
+    )
+    can_delete = False
+
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ("user", "stripe_customer_id", "created_at")
+    search_fields = ("user__email", "stripe_customer_id")
+    readonly_fields = ("stripe_customer_id", "created_at")
+    inlines = [SubscriptionInline]
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = (
+        "stripe_subscription_id", "get_user_email", "status",
+        "current_period_end", "cancel_at_period_end", "updated_at",
+    )
+    list_filter = ("status", "cancel_at_period_end")
+    search_fields = ("stripe_subscription_id", "customer__user__email")
+    readonly_fields = ("stripe_subscription_id", "stripe_price_id", "created_at", "updated_at")
+
+    @admin.display(description="User Email")
+    def get_user_email(self, obj):
+        return obj.customer.user.email
+
+
+@admin.register(PaymentEvent)
+class PaymentEventAdmin(admin.ModelAdmin):
+    list_display = ("stripe_event_id", "event_type", "processed_at")
+    list_filter = ("event_type",)
+    search_fields = ("stripe_event_id", "event_type")
+    readonly_fields = ("stripe_event_id", "event_type", "processed_at", "payload")
+
+    def has_add_permission(self, request):
+        return False  # events are logged by webhooks only

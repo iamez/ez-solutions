@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{% block title %}Tech-IT Solutions{% endblock %}</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	{% block extra_head %}{% endblock %}
+</head>
+<body style="font-family: 'Inter', sans-serif; background: #f8fafc;">
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+		<div class="container">
+			<a class="navbar-brand d-flex align-items-center" href="{% url 'home:index' %}">
+				<i class="bi bi-lightning-charge-fill text-primary fs-2 me-2"></i>
+				<span class="fw-bold">Tech-IT Solutions</span>
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+					<li class="nav-item"><a class="nav-link" href="{% url 'home:index' %}">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="{% url 'services:pricing' %}">Pricing</a></li>
+					{% if user.is_authenticated %}
+						<li class="nav-item"><a class="nav-link" href="{% url 'users:dashboard' %}">Dashboard</a></li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+								<i class="bi bi-person-circle me-1"></i>{{ user.full_name }}
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end shadow-sm">
+								<li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+								<li><a class="dropdown-item" href="{% url 'orders:billing' %}"><i class="bi bi-credit-card me-2"></i>Billing</a></li>
+								<li><a class="dropdown-item" href="{% url 'tickets:list' %}"><i class="bi bi-headset me-2"></i>Support Tickets</a></li>
+								<li><hr class="dropdown-divider"></li>
+								<li>
+									<form method="post" action="{% url 'account_logout' %}" class="d-inline">
+										{% csrf_token %}
+										<button type="submit" class="dropdown-item text-danger">
+											<i class="bi bi-box-arrow-right me-2"></i>Sign Out
+										</button>
+									</form>
+								</li>
+							</ul>
+						</li>
+					{% else %}
+						<li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+						<li class="nav-item">
+							<a class="btn btn-primary btn-sm ms-2 px-3" href="{% url 'account_signup' %}">Get Started</a>
+						</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Main Content -->
+	<main class="main-content">
+		{% block content %}{% endblock %}
+	</main>
+
+	<!-- Footer -->
+	<footer class="footer bg-dark text-light py-4 mt-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 mb-3 mb-md-0">
+					<h5 class="fw-bold">Tech-IT Solutions</h5>
+					<p class="mb-0">Modern hosting & tech solutions for your business. 99.9% uptime. 24/7 support.</p>
+				</div>
+				<div class="col-md-6 text-md-end">
+					<a href="#" class="text-light me-3"><i class="bi bi-facebook"></i></a>
+					<a href="#" class="text-light me-3"><i class="bi bi-twitter"></i></a>
+					<a href="#" class="text-light me-3"><i class="bi bi-linkedin"></i></a>
+					<a href="#" class="text-light"><i class="bi bi-github"></i></a>
+				</div>
+			</div>
+			<div class="row mt-3">
+				<div class="col-12 text-center">
+					<small>&copy; {{ year|default:2025 }} Tech-IT Solutions. All rights reserved.</small>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	{% block extra_js %}{% endblock %}
+</body>
+</html>

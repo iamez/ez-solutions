@@ -1,0 +1,70 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "-v",
+    "--cov=.",
+    "--cov-report=term-missing",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = [
+    "venv",
+    ".venv",
+    "migrations",
+    "__pycache__",
+    "staticfiles",
+    "ai_instructions_copilot_instructions_readme",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "S",   # bandit security
+    "DJ",  # flake8-django
+]
+ignore = [
+    "S101",   # assert is fine in tests
+    "DJ001",  # nullable CharField — we prefer explicit
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S105", "S106"]
+"config/settings/*" = ["F401", "F403", "S105"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["users", "services", "orders", "tickets", "domains", "api", "home", "config"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+exclude = '''
+/(
+    \.git
+  | venv
+  | migrations
+  | staticfiles
+)/
+'''
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/migrations/*",
+    "venv/*",
+    "manage.py",
+    "config/settings/*",
+    "*/tests/*",
+]

@@ -1,0 +1,148 @@
+# Prometheus Alert Rules for Tech-IT Solutions
+# Save as: alert_rules.yml
+
+groups:
+  - name: application_alerts
+    interval: 30s
+    rules:
+      # Application is down
+      - alert: ApplicationDown
+        expr: up{job="django-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Django application is down"
+          description: "The Django application has been down for more than 1 minute."
+
+      # High response time
+      - alert: HighResponseTime
+        expr: http_request_duration_seconds{quantile="0.95"} > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High application response time"
+          description: "95th percentile response time is above 2 seconds for 5 minutes."
+
+      # High error rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate"
+          description: "More than 5% of requests are returning 5xx errors."
+
+  - name: system_alerts
+    interval: 30s
+    rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: system_cpu_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 85% for 5 minutes."
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: system_memory_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for 5 minutes."
+
+      # Low disk space
+      - alert: LowDiskSpace
+        expr: system_disk_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Disk usage is above 85%."
+
+      # Critical disk space
+      - alert: CriticalDiskSpace
+        expr: system_disk_percent > 95
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical disk space"
+          description: "Disk usage is above 95%. Immediate action required!"
+
+  - name: database_alerts
+    interval: 30s
+    rules:
+      # Database connection pool exhausted
+      - alert: DatabaseConnectionPoolExhausted
+        expr: db_connections_total > 90
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "More than 90 database connections are active."
+
+      # Database slow queries
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_database_blks_read[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of database disk reads"
+          description: "Database is performing many disk reads, indicating slow queries or missing indexes."
+
+  - name: nginx_alerts
+    interval: 30s
+    rules:
+      # Nginx high request rate
+      - alert: NginxHighRequestRate
+        expr: rate(nginx_http_requests_total[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request rate on Nginx"
+          description: "Nginx is receiving more than 1000 requests per second."
+
+      # Nginx high error rate
+      - alert: NginxHighErrorRate
+        expr: rate(nginx_http_requests_total{status=~"5.."}[5m]) > 10
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate on Nginx"
+          description: "Nginx is returning many 5xx errors."
+
+  - name: ssl_certificate_alerts
+    interval: 1d
+    rules:
+      # SSL certificate expiring soon
+      - alert: SSLCertificateExpiringSoon
+        expr: (ssl_certificate_expiry_seconds - time()) / 86400 < 30
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate will expire in less than 30 days."
+
+      # SSL certificate expired
+      - alert: SSLCertificateExpired
+        expr: (ssl_certificate_expiry_seconds - time()) < 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL certificate has expired"
+          description: "SSL certificate has expired! Site is not secure!"
