@@ -31,4 +31,4 @@ whitenoise==6.9.0
 gunicorn==23.0.0
 
 # Monitoring
-sentry-sdk[django]==2.24.0
+sentry-sdk[django]==2.53.0
