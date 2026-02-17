@@ -11,8 +11,16 @@ addopts = [
     "--cov-report=term-missing",
 ]
 
+[tool.bandit]
+exclude_dirs = ["venv", ".venv", "tests", "ai_instructions_copilot_instructions_readme"]
+skips = [
+    "B101",   # assert is fine in tests (excluded separately)
+    "B104",   # 0.0.0.0 in dev ALLOWED_HOSTS is intentional
+]
+severity = "medium"
+
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 100
 exclude = [
     "venv",

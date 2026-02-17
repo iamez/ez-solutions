@@ -1,10 +1,11 @@
-# EZ Solutions — git ignore list
+# EZ Solutions — comprehensive git ignore
 
-# Python
+# ── Python ──────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pdb
 .Python
 pip-log.txt
 pip-delete-this-directory.txt
@@ -20,44 +21,102 @@ develop-eggs/
 .installed.cfg
 lib/
 lib64/
+wheels/
+share/python-wheels/
+MANIFEST
 
-# Virtual environments
+# ── Virtual environments ─────────────────────────────────────────────────────
 venv/
 .venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
-# Django
+# ── Django ───────────────────────────────────────────────────────────────────
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
+/static/CACHE/
 
-# Environment variables — NEVER COMMIT
+# ── Environment / secrets — NEVER COMMIT ────────────────────────────────────
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.yml
+secrets.yaml
 
-# IDE / editors
-.idea/
-.vscode/
-*.swp
-*.swo
-*.sublime-*
-
-# OS
-.DS_Store
-Thumbs.db
-ehthumbs.db
-
-# Coverage
+# ── Testing & coverage ───────────────────────────────────────────────────────
 .coverage
+.coverage.*
 htmlcov/
 .tox/
+.nox/
 .cache/
 .pytest_cache/
 nosetests.xml
 coverage.xml
 *.cover
+*.lcov
+junit*.xml
+
+# ── Linting & type-checking ───────────────────────────────────────────────────
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# ── Security scanning ────────────────────────────────────────────────────────
+.bandit
+bandit-report.json
+
+# ── Pre-commit ────────────────────────────────────────────────────────────────
+.secrets.baseline
+
+# ── IDE / editors ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-*
+*.code-workspace
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ── Celery ───────────────────────────────────────────────────────────────────
+celerybeat-schedule
+celerybeat.pid
+
+# ── Node (if ever added for frontend tooling) ────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+*.env.docker
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.orig
+*.rej

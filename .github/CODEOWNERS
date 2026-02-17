@@ -1,0 +1,15 @@
+# CODEOWNERS — auto-request reviews on PRs
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owner — all files
+* @iamez
+
+# Configuration & secrets
+config/settings/prod.py  @iamez
+.env.example             @iamez
+
+# CI/CD & security workflows
+.github/                 @iamez
+
+# Billing code — extra scrutiny
+orders/                  @iamez

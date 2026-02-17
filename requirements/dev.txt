@@ -13,6 +13,10 @@ ruff==0.9.9
 black==25.1.0
 pre-commit==4.2.0
 
+# Security scanning
+bandit[toml]==1.9.3
+pip-audit==2.10.0
+
 # Debugging
 django-debug-toolbar==5.1.0
 ipython==8.32.0

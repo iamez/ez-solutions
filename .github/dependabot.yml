@@ -1,0 +1,46 @@
+version: 2
+
+updates:
+  # ── Python dependencies ─────────────────────────────────────────────────
+  - package-ecosystem: pip
+    directory: /requirements
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps):"
+    groups:
+      # Group dev/test tools so they land as one PR
+      dev-dependencies:
+        patterns:
+          - "pytest*"
+          - "ruff"
+          - "black"
+          - "pre-commit"
+          - "factory*"
+          - "faker"
+          - "responses"
+          - "ipython"
+          - "django-debug-toolbar"
+          - "bandit"
+          - "pip-audit"
+      # Core Django stack as one PR
+      django-stack:
+        patterns:
+          - "Django"
+          - "django-*"
+          - "asgiref"
+          - "sqlparse"
+
+  # ── GitHub Actions ──────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+    commit-message:
+      prefix: "chore(ci):"
+    open-pull-requests-limit: 5
