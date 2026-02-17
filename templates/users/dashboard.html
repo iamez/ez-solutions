@@ -52,7 +52,7 @@
         <div class="card-body">
           <i class="bi bi-ticket-detailed fs-2 text-warning mb-2 d-block"></i>
           <p class="text-muted small mb-0">Open Tickets</p>
-          <h3 class="fw-bold mb-0">0</h3>
+          <h3 class="fw-bold mb-0">{{ open_tickets }}</h3>
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@
           <i class="bi bi-server fs-1 text-primary mb-3"></i>
           <h5 class="card-title fw-bold">Services</h5>
           <p class="card-text text-muted small">Browse and manage your hosting plans, VPS, and SSL certificates.</p>
-          <a href="#" class="btn btn-primary btn-sm px-4">Browse Plans</a>
+          <a href="{% url 'services:pricing' %}" class="btn btn-primary btn-sm px-4">Browse Plans</a>
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@
           <i class="bi bi-headset fs-1 text-success mb-3"></i>
           <h5 class="card-title fw-bold">Support</h5>
           <p class="card-text text-muted small">Open a ticket or browse the knowledge base. We respond within 24h.</p>
-          <a href="#" class="btn btn-success btn-sm px-4">Open Ticket</a>
+          <a href="{% url 'tickets:create' %}" class="btn btn-success btn-sm px-4">Open Ticket</a>
         </div>
       </div>
     </div>
@@ -104,7 +104,7 @@
           <i class="bi bi-credit-card fs-1 text-warning mb-3"></i>
           <h5 class="card-title fw-bold">Billing</h5>
           <p class="card-text text-muted small">View invoices, manage subscriptions, and update payment methods.</p>
-          <a href="#" class="btn btn-warning btn-sm px-4">View Billing</a>
+          <a href="{% url 'orders:billing' %}" class="btn btn-warning btn-sm px-4">View Billing</a>
         </div>
       </div>
     </div>
@@ -116,7 +116,7 @@
     <i class="bi bi-stars fs-4 me-3"></i>
     <div>
       <strong>Upgrade your plan</strong> to unlock faster hosting, more storage, and priority support.
-      <a href="#" class="alert-link ms-2">See plans </a>
+      <a href="{% url 'services:pricing' %}" class="alert-link ms-2">See plans &rarr;</a>
     </div>
   </div>
   {% endif %}
