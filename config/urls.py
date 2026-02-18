@@ -5,9 +5,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from .health import AppHealthCheckView
+
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
+    # Infrastructure health endpoint
+    path("ht/", AppHealthCheckView.as_view(), name="health-check"),
     # Public pages
     path("", include("home.urls", namespace="home")),
     # Allauth (login, logout, register, email verification, password reset)

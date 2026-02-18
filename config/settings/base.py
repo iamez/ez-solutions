@@ -39,6 +39,8 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
+    # Monitoring health checks
+    "health_check",
     # Celery beat
     "django_celery_beat",
 ]

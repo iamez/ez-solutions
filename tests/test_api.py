@@ -17,6 +17,7 @@ TOKEN_REFRESH_URL = "/api/v1/auth/token/refresh/"
 PLANS_URL = "/api/v1/plans/"
 TICKETS_URL = "/api/v1/tickets/"
 ME_URL = "/api/v1/me/"
+INFRA_HEALTH_URL = "/ht/"
 
 
 # ---------------------------------------------------------------------------
@@ -404,3 +405,10 @@ class TestRobotsTxt:
     def test_cache_header_set(self, api_client):
         resp = api_client.get("/robots.txt")
         assert "max-age" in resp.get("Cache-Control", "")
+
+
+@pytest.mark.django_db
+class TestInfraHealth:
+    def test_health_check_endpoint_responds(self, api_client):
+        resp = api_client.get(f"{INFRA_HEALTH_URL}?format=json")
+        assert resp.status_code == 200
