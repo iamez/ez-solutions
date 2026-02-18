@@ -96,3 +96,135 @@ class PaymentEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.event_type} — {self.stripe_event_id}"
+
+
+class OrderStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    PAID = "paid", "Paid"
+    CANCELED = "canceled", "Canceled"
+    FAILED = "failed", "Failed"
+
+
+class ProvisioningStatus(models.TextChoices):
+    QUEUED = "queued", "Queued"
+    PROVISIONING = "provisioning", "Provisioning"
+    READY = "ready", "Ready"
+    FAILED = "failed", "Failed"
+
+
+class VPSInstanceStatus(models.TextChoices):
+    PROVISIONING = "provisioning", "Provisioning"
+    RUNNING = "running", "Running"
+    STOPPED = "stopped", "Stopped"
+    SUSPENDED = "suspended", "Suspended"
+    TERMINATED = "terminated", "Terminated"
+    ERROR = "error", "Error"
+
+
+class Order(models.Model):
+    """Commercial order record tying customer, plan, and payment references."""
+
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="orders")
+    service_plan = models.ForeignKey("services.ServicePlan", on_delete=models.PROTECT)
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=OrderStatus.choices,
+        default=OrderStatus.PENDING,
+        db_index=True,
+    )
+    stripe_checkout_session_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        unique=True,
+    )
+    stripe_payment_intent_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        unique=True,
+    )
+    amount_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    currency = models.CharField(max_length=10, default="usd")
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Order #{self.pk} ({self.status})"
+
+
+class ProvisioningJob(models.Model):
+    """Tracks async infrastructure provisioning progress per order."""
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="provisioning_jobs")
+    provider = models.CharField(max_length=50, default="proxmox")
+    status = models.CharField(
+        max_length=20,
+        choices=ProvisioningStatus.choices,
+        default=ProvisioningStatus.QUEUED,
+        db_index=True,
+    )
+    external_id = models.CharField(max_length=100, blank=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(blank=True)
+    payload = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"ProvisioningJob #{self.pk} ({self.status})"
+
+
+class VPSInstance(models.Model):
+    """Represents a provisioned VPS instance linked to a customer order flow."""
+
+    provisioning_job = models.OneToOneField(
+        ProvisioningJob,
+        on_delete=models.CASCADE,
+        related_name="vps_instance",
+    )
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="vps_instances")
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vps_instances",
+    )
+    hostname = models.CharField(max_length=255)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    proxmox_vmid = models.PositiveIntegerField(null=True, blank=True, unique=True)
+    os_template = models.CharField(max_length=100, blank=True)
+    cpu_cores = models.PositiveSmallIntegerField(default=1)
+    ram_mb = models.PositiveIntegerField(default=1024)
+    disk_gb = models.PositiveIntegerField(default=20)
+    status = models.CharField(
+        max_length=20,
+        choices=VPSInstanceStatus.choices,
+        default=VPSInstanceStatus.PROVISIONING,
+        db_index=True,
+    )
+    credentials_ref = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.hostname} ({self.status})"

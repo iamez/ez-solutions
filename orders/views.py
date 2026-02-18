@@ -1,5 +1,3 @@
-"""Billing views — Stripe Checkout, billing portal, and webhook handler."""
-
 import logging
 
 import stripe
@@ -14,9 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from services.models import ServicePlan
-from users.models import SubscriptionTier
 
-from .models import Customer, PaymentEvent, Subscription, SubscriptionStatus
+from .models import Customer, PaymentEvent, SubscriptionStatus
+from .tasks import process_stripe_event
+from .webhooks import HANDLED_EVENTS, handle_event
 
 log = logging.getLogger(__name__)
 
@@ -110,17 +109,10 @@ def billing_portal(request):
 # Webhook
 # ---------------------------------------------------------------------------
 
-HANDLED_EVENTS = {
-    "checkout.session.completed",
-    "customer.subscription.updated",
-    "customer.subscription.deleted",
-}
-
-
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
-    """Receive, verify, and process Stripe webhook events."""
+    """Receive, verify, and enqueue Stripe webhook events."""
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
     webhook_secret = settings.STRIPE_WEBHOOK_SECRET
@@ -132,26 +124,27 @@ def stripe_webhook(request):
     except stripe.error.SignatureVerificationError:
         return HttpResponseBadRequest("Invalid signature")
 
-    # Idempotency — skip already-processed events
-    if PaymentEvent.objects.filter(stripe_event_id=event["id"]).exists():
-        return HttpResponse("already processed", status=200)
-
-    if event["type"] in HANDLED_EVENTS:
-        try:
-            _handle_event(event)
-        except Exception:  # noqa: BLE001
-            log.exception("Webhook handler raised for event %s", event["id"])
-            return HttpResponse("handler error", status=500)
-
-    # Record event as processed
+    created = False
     try:
-        PaymentEvent.objects.create(
+        payment_event, created = PaymentEvent.objects.get_or_create(
             stripe_event_id=event["id"],
-            event_type=event["type"],
-            payload=dict(event),
+            defaults={
+                "event_type": event["type"],
+                "payload": dict(event),
+            },
         )
     except IntegrityError:
-        pass  # race condition — another worker already recorded it
+        return HttpResponse("already processed", status=200)
+
+    if created and payment_event.event_type in HANDLED_EVENTS:
+        try:
+            process_stripe_event.apply_async(args=[payment_event.pk], ignore_result=True)
+        except Exception:  # noqa: BLE001
+            log.exception(
+                "Celery enqueue failed for %s; processing synchronously",
+                payment_event.stripe_event_id,
+            )
+            handle_event(payment_event.payload)
 
     return HttpResponse("ok", status=200)
 
@@ -169,101 +162,3 @@ def _get_or_create_stripe_customer(user) -> str:
         metadata={"user_id": str(user.pk)},
     )
     return stripe_customer["id"]
-
-
-def _handle_event(event: dict) -> None:
-    """Route a Stripe event to the correct handler."""
-    event_type = event["type"]
-    data = event["data"]["object"]
-
-    if event_type == "checkout.session.completed":
-        _handle_checkout_completed(data)
-    elif event_type.startswith("customer.subscription."):
-        _handle_subscription_change(data)
-
-
-def _handle_checkout_completed(session: dict) -> None:
-    """After a successful checkout, provision the subscription."""
-    stripe_customer_id = session.get("customer")
-    stripe_sub_id = session.get("subscription")
-    if not stripe_customer_id or not stripe_sub_id:
-        return
-
-    try:
-        customer = Customer.objects.get(stripe_customer_id=stripe_customer_id)
-    except Customer.DoesNotExist:
-        log.warning("Checkout completed for unknown customer %s", stripe_customer_id)
-        return
-
-    # Fetch full subscription from Stripe to get price/period data
-    stripe_sub = stripe.Subscription.retrieve(stripe_sub_id)
-    _upsert_subscription(customer, stripe_sub)
-
-    # Upgrade the user's subscription_tier based on metadata
-    plan_slug = session.get("metadata", {}).get("plan_slug", "")
-    _update_user_tier(customer.user, plan_slug)
-
-
-def _handle_subscription_change(subscription: dict) -> None:
-    """Keep our Subscription record in sync with Stripe."""
-    stripe_customer_id = subscription.get("customer")
-    try:
-        customer = Customer.objects.get(stripe_customer_id=stripe_customer_id)
-    except Customer.DoesNotExist:
-        return
-
-    _upsert_subscription(customer, subscription)
-
-    # Sync user tier — if canceled, downgrade to free
-    new_status = subscription.get("status", "")
-    if new_status in ("canceled", "unpaid", "incomplete_expired"):
-        customer.user.subscription_tier = SubscriptionTier.FREE  # type: ignore[attr-defined]
-        customer.user.save(update_fields=["subscription_tier"])
-
-
-def _upsert_subscription(customer: Customer, stripe_sub: dict) -> Subscription:
-    import datetime
-
-    def _ts(val):
-        if val:
-            return datetime.datetime.fromtimestamp(val, tz=datetime.UTC)
-        return None
-
-    price_id = ""
-    items = stripe_sub.get("items", {}).get("data", [])
-    if items:
-        price_id = items[0].get("price", {}).get("id", "")
-
-    sub, _ = Subscription.objects.update_or_create(
-        stripe_subscription_id=stripe_sub["id"],
-        defaults={
-            "customer": customer,
-            "stripe_price_id": price_id,
-            "status": stripe_sub.get("status", "incomplete"),
-            "current_period_start": _ts(stripe_sub.get("current_period_start")),
-            "current_period_end": _ts(stripe_sub.get("current_period_end")),
-            "cancel_at_period_end": stripe_sub.get("cancel_at_period_end", False),
-        },
-    )
-    return sub
-
-
-def _update_user_tier(user, plan_slug: str) -> None:
-    """Map a plan slug to a SubscriptionTier and save it on the user."""
-    from services.models import ServicePlan
-
-    try:
-        plan = ServicePlan.objects.get(slug=plan_slug)
-        tier_key = plan.tier_key
-    except ServicePlan.DoesNotExist:
-        tier_key = ""
-
-    mapping = {
-        "starter": SubscriptionTier.STARTER,
-        "professional": SubscriptionTier.PROFESSIONAL,
-        "enterprise": SubscriptionTier.ENTERPRISE,
-    }
-    new_tier = mapping.get(tier_key)
-    if new_tier:
-        user.subscription_tier = new_tier
-        user.save(update_fields=["subscription_tier"])

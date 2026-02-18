@@ -1,6 +1,7 @@
 """DRF serializers for the public / authenticated REST API."""
 
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from orders.models import Subscription
@@ -149,6 +150,7 @@ class MeSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "email", "subscription_tier", "date_joined", "subscription"]
 
+    @extend_schema_field(SubscriptionSerializer(allow_null=True))
     def get_subscription(self, user):
         customer = getattr(user, "stripe_customer", None)
         if customer is None:

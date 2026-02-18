@@ -11,6 +11,7 @@ import pytest
 from django.urls import reverse
 
 from orders.models import Customer, PaymentEvent, Subscription, SubscriptionStatus
+from orders.tasks import process_stripe_event
 from services.models import ServicePlan
 from users.models import SubscriptionTier
 
@@ -258,7 +259,7 @@ class TestStripeWebhook:
 
     @patch("orders.views.stripe.Webhook.construct_event")
     def test_webhook_idempotency(self, mock_construct, client, db):
-        """Second delivery of same event_id must return 200 without re-processing."""
+        """Second delivery of same event_id must return 200 and not duplicate rows."""
         event = {"id": "evt_dup_001", "type": "payment_intent.succeeded", "data": {"object": {}}}
         mock_construct.return_value = event
 
@@ -271,7 +272,7 @@ class TestStripeWebhook:
 
         resp = _build_webhook_request(client, event)
         assert resp.status_code == 200
-        assert resp.content == b"already processed"
+        assert PaymentEvent.objects.filter(stripe_event_id="evt_dup_001").count() == 1
 
     @patch("orders.views.stripe.Webhook.construct_event")
     def test_webhook_records_unhandled_event(self, mock_construct, client, db):
@@ -283,9 +284,11 @@ class TestStripeWebhook:
         assert resp.status_code == 200
         assert PaymentEvent.objects.filter(stripe_event_id="evt_unknown_001").exists()
 
-    @patch("orders.views._handle_event")
+    @patch("orders.views.process_stripe_event.apply_async")
     @patch("orders.views.stripe.Webhook.construct_event")
-    def test_webhook_calls_handler_for_known_event(self, mock_construct, mock_handle, client, db):
+    def test_webhook_enqueues_task_for_known_event(
+        self, mock_construct, mock_apply_async, client, db
+    ):
         event = {
             "id": "evt_checkout_001",
             "type": "checkout.session.completed",
@@ -295,11 +298,13 @@ class TestStripeWebhook:
 
         resp = _build_webhook_request(client, event)
         assert resp.status_code == 200
-        mock_handle.assert_called_once_with(event)
+        payment_event = PaymentEvent.objects.get(stripe_event_id="evt_checkout_001")
+        mock_apply_async.assert_called_once_with(args=[payment_event.pk], ignore_result=True)
 
+    @patch("orders.views.process_stripe_event.apply_async")
     @patch("orders.views.stripe.Webhook.construct_event")
     def test_webhook_subscription_canceled_downgrades_user(
-        self, mock_construct, client, user, customer, db
+        self, mock_construct, mock_apply_async, client, user, customer, db
     ):
         """customer.subscription.deleted webhook must downgrade user to free tier."""
         user.subscription_tier = "starter"
@@ -321,9 +326,13 @@ class TestStripeWebhook:
             },
         }
         mock_construct.return_value = event
+        mock_apply_async.return_value = None
 
         resp = _build_webhook_request(client, event)
         assert resp.status_code == 200
+
+        payment_event = PaymentEvent.objects.get(stripe_event_id="evt_cancel_001")
+        process_stripe_event(payment_event.pk)
 
         user.refresh_from_db()
         assert user.subscription_tier == SubscriptionTier.FREE

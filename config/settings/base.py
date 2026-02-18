@@ -3,6 +3,7 @@ Base settings shared across all environments.
 Secrets and environment-specific values are read from .env via python-decouple.
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 from decouple import Csv, config
@@ -35,6 +36,8 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     # REST
     "rest_framework",
+    "drf_spectacular",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     # Celery beat
     "django_celery_beat",
@@ -45,7 +48,6 @@ LOCAL_APPS = [
     "services.apps.ServicesConfig",
     "orders.apps.OrdersConfig",
     "tickets.apps.TicketsConfig",
-    # "domains.apps.DomainsConfig",  # Phase 3: re-enable when domain models are built
     "api.apps.ApiConfig",
     "home.apps.HomeConfig",
 ]
@@ -169,13 +171,30 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "EZ Solutions API",
+    "DESCRIPTION": "Public and authenticated API endpoints for EZ Solutions.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
 }
 
 # ---------------------------------------------------------------------------

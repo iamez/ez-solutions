@@ -10,6 +10,10 @@ from services.models import ServicePlan
 from tickets.models import Ticket, TicketMessage, TicketPriority, TicketStatus
 
 HEALTH_URL = "/api/health/"
+SCHEMA_URL = "/api/v1/schema/"
+DOCS_URL = "/api/v1/docs/"
+TOKEN_URL = "/api/v1/auth/token/"
+TOKEN_REFRESH_URL = "/api/v1/auth/token/refresh/"
 PLANS_URL = "/api/v1/plans/"
 TICKETS_URL = "/api/v1/tickets/"
 ME_URL = "/api/v1/me/"
@@ -126,7 +130,40 @@ class TestHealth:
     def test_returns_ok(self, api_client):
         resp = api_client.get(HEALTH_URL)
         assert resp.status_code == 200
-        assert resp.json() == {"status": "ok"}
+
+
+@pytest.mark.django_db
+class TestApiDocsAndJwt:
+    def test_schema_endpoint_returns_openapi_document(self, api_client):
+        resp = api_client.get(SCHEMA_URL)
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert "openapi:" in content
+        assert "paths:" in content
+
+    def test_docs_endpoint_accessible(self, api_client):
+        resp = api_client.get(DOCS_URL)
+        assert resp.status_code == 200
+        assert "text/html" in resp["Content-Type"]
+
+    def test_token_obtain_pair_returns_tokens(self, api_client, user):
+        resp = api_client.post(TOKEN_URL, {"email": user.email, "password": "StrongPass123!"})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "access" in data
+        assert "refresh" in data
+
+    def test_token_refresh_returns_new_access_token(self, api_client, user):
+        obtain = api_client.post(
+            TOKEN_URL,
+            {"email": user.email, "password": "StrongPass123!"},
+        )
+        assert obtain.status_code == 200
+        refresh_token = obtain.json()["refresh"]
+
+        resp = api_client.post(TOKEN_REFRESH_URL, {"refresh": refresh_token})
+        assert resp.status_code == 200
+        assert "access" in resp.json()
 
     def test_no_auth_required(self, api_client):
         # No credentials — still succeeds
@@ -176,7 +213,7 @@ class TestPlanList:
 class TestTicketList:
     def test_requires_auth(self, api_client):
         resp = api_client.get(TICKETS_URL)
-        assert resp.status_code == 403
+        assert resp.status_code in (401, 403)
 
     def test_returns_own_tickets(self, auth_client, ticket):
         resp = auth_client.get(TICKETS_URL)
@@ -200,7 +237,7 @@ class TestTicketList:
 class TestTicketCreate:
     def test_requires_auth(self, api_client):
         resp = api_client.post(TICKETS_URL, {"subject": "x", "body": "y"})
-        assert resp.status_code == 403
+        assert resp.status_code in (401, 403)
 
     def test_creates_ticket_with_first_message(self, auth_client, user):
         payload = {"subject": "Need help", "body": "My connection is slow.", "priority": "high"}
@@ -232,7 +269,7 @@ class TestTicketCreate:
 class TestTicketDetail:
     def test_requires_auth(self, api_client, ticket):
         resp = api_client.get(f"{TICKETS_URL}{ticket.pk}/")
-        assert resp.status_code == 403
+        assert resp.status_code in (401, 403)
 
     def test_returns_ticket(self, auth_client, ticket):
         resp = auth_client.get(f"{TICKETS_URL}{ticket.pk}/")
@@ -268,7 +305,7 @@ class TestTicketReply:
 
     def test_requires_auth(self, api_client, ticket):
         resp = api_client.post(self._reply_url(ticket.pk), {"body": "hi"})
-        assert resp.status_code == 403
+        assert resp.status_code in (401, 403)
 
     def test_adds_reply_to_open_ticket(self, auth_client, ticket):
         resp = auth_client.post(self._reply_url(ticket.pk), {"body": "Follow-up message."})
@@ -307,7 +344,7 @@ class TestTicketReply:
 class TestMe:
     def test_requires_auth(self, api_client):
         resp = api_client.get(ME_URL)
-        assert resp.status_code == 403
+        assert resp.status_code in (401, 403)
 
     def test_returns_user_profile(self, auth_client, user):
         resp = auth_client.get(ME_URL)

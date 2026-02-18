@@ -1,6 +1,7 @@
 """REST API views — versioned under /api/v1/."""
 
-from rest_framework import status
+from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,6 +29,15 @@ class HealthView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []  # skip session/token lookup for speed
 
+    @extend_schema(
+        operation_id="health_check",
+        responses={
+            200: inline_serializer(
+                name="HealthResponse",
+                fields={"status": serializers.CharField()},
+            )
+        },
+    )
     def get(self, request):
         return Response({"status": "ok"})
 
@@ -43,6 +53,10 @@ class PlanListView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    @extend_schema(
+        operation_id="v1_plans_list",
+        responses=ServicePlanSerializer(many=True),
+    )
     def get(self, request):
         plans = ServicePlan.objects.filter(is_active=True)
         serializer = ServicePlanSerializer(plans, many=True)
@@ -62,11 +76,20 @@ class TicketListCreateView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        operation_id="v1_tickets_list",
+        responses=TicketSerializer(many=True),
+    )
     def get(self, request):
         tickets = request.user.tickets.prefetch_related("messages").all()
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        operation_id="v1_tickets_create",
+        request=TicketCreateSerializer,
+        responses={201: TicketSerializer, 400: OpenApiResponse(description="Validation error")},
+    )
     def post(self, request):
         serializer = TicketCreateSerializer(data=request.data)
         if not serializer.is_valid():
@@ -109,6 +132,10 @@ class TicketDetailView(APIView):
         except Ticket.DoesNotExist:
             return None
 
+    @extend_schema(
+        operation_id="v1_tickets_detail",
+        responses={200: TicketSerializer, 404: OpenApiResponse(description="Not found")},
+    )
     def get(self, request, pk):
         ticket = self._get_ticket(request, pk)
         if ticket is None:
@@ -123,6 +150,15 @@ class TicketReplyView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        operation_id="v1_tickets_reply",
+        request=TicketReplySerializer,
+        responses={
+            201: TicketMessageSerializer,
+            400: OpenApiResponse(description="Validation error or ticket closed"),
+            404: OpenApiResponse(description="Not found"),
+        },
+    )
     def post(self, request, pk):
         try:
             ticket = Ticket.objects.get(pk=pk, user=request.user)
@@ -161,9 +197,21 @@ class MeView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(operation_id="v1_me_retrieve", responses=MeSerializer)
     def get(self, request):
         return Response(MeSerializer(request.user).data)
 
+    @extend_schema(
+        operation_id="v1_me_partial_update",
+        request=inline_serializer(
+            name="MePatchRequest",
+            fields={
+                "first_name": serializers.CharField(required=False),
+                "last_name": serializers.CharField(required=False),
+            },
+        ),
+        responses={200: MeSerializer, 400: OpenApiResponse(description="Invalid payload")},
+    )
     def patch(self, request):
         allowed = {k: v for k, v in request.data.items() if k in ("first_name", "last_name")}
         if not allowed:

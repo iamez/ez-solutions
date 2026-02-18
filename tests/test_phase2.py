@@ -6,6 +6,7 @@ Covers: ServicePlan model, PlanFeature, pricing page public access.
 import pytest
 from django.urls import reverse
 
+from orders.models import Customer, Order, OrderStatus, ProvisioningJob, VPSInstance
 from services.models import PlanFeature, ServicePlan
 
 PRICING_URL = reverse("services:pricing")
@@ -110,6 +111,76 @@ class TestPlanFeatureModel:
         features = list(starter_plan.features.all())
         assert features[0].text == "Up to 3 domains"
         assert features[1].text == "Priority support"
+
+
+@pytest.mark.django_db
+class TestOrderFulfillmentModels:
+    def test_order_creation(self, user, starter_plan):
+        customer = Customer.objects.create(user=user, stripe_customer_id="cus_order_001")
+        order = Order.objects.create(
+            customer=customer,
+            service_plan=starter_plan,
+            status=OrderStatus.PAID,
+            amount_total="29.00",
+            currency="usd",
+        )
+        assert order.customer == customer
+        assert order.service_plan == starter_plan
+        assert order.status == OrderStatus.PAID
+
+    def test_provisioning_job_links_to_order(self, user, starter_plan):
+        customer = Customer.objects.create(user=user, stripe_customer_id="cus_order_002")
+        order = Order.objects.create(
+            customer=customer,
+            service_plan=starter_plan,
+            amount_total="29.00",
+        )
+        job = ProvisioningJob.objects.create(order=order, provider="proxmox")
+        assert job.order == order
+        assert order.provisioning_jobs.count() == 1
+
+    def test_vps_instance_links_to_provisioning_job(self, user, starter_plan):
+        customer = Customer.objects.create(user=user, stripe_customer_id="cus_order_003")
+        order = Order.objects.create(
+            customer=customer,
+            service_plan=starter_plan,
+            amount_total="29.00",
+        )
+        job = ProvisioningJob.objects.create(order=order)
+        instance = VPSInstance.objects.create(
+            provisioning_job=job,
+            customer=customer,
+            hostname="vps-001.ez-solutions.local",
+            cpu_cores=2,
+            ram_mb=2048,
+            disk_gb=40,
+        )
+        assert instance.provisioning_job == job
+        assert job.vps_instance == instance
+
+    def test_order_str(self, user, starter_plan):
+        customer = Customer.objects.create(user=user, stripe_customer_id="cus_order_004")
+        order = Order.objects.create(
+            customer=customer,
+            service_plan=starter_plan,
+            amount_total="29.00",
+        )
+        assert "Order" in str(order)
+
+    def test_vps_instance_str(self, user, starter_plan):
+        customer = Customer.objects.create(user=user, stripe_customer_id="cus_order_005")
+        order = Order.objects.create(
+            customer=customer,
+            service_plan=starter_plan,
+            amount_total="29.00",
+        )
+        job = ProvisioningJob.objects.create(order=order)
+        instance = VPSInstance.objects.create(
+            provisioning_job=job,
+            customer=customer,
+            hostname="vps-002.ez-solutions.local",
+        )
+        assert "vps-002" in str(instance)
 
 
 # ---------------------------------------------------------------------------
