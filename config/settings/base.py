@@ -43,6 +43,8 @@ THIRD_PARTY_APPS = [
     "health_check",
     # Celery beat
     "django_celery_beat",
+    # Security
+    "axes",
 ]
 
 LOCAL_APPS = [
@@ -52,6 +54,7 @@ LOCAL_APPS = [
     "tickets.apps.TicketsConfig",
     "api.apps.ApiConfig",
     "home.apps.HomeConfig",
+    "notifications.apps.NotificationsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -70,6 +73,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -113,6 +118,7 @@ DATABASES = {
 AUTH_USER_MODEL = "users.User"
 
 AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
@@ -134,7 +140,7 @@ LOGIN_URL = "account_login"
 # ---------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -177,8 +183,18 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+        "ticket_create": "10/hour",
+        "jwt_auth": "5/minute",
+    },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
@@ -227,3 +243,67 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # Sentry (optional; only activates when DSN is set)
 # ---------------------------------------------------------------------------
 SENTRY_DSN = config("SENTRY_DSN", default="")
+
+# ---------------------------------------------------------------------------
+# django-axes — brute-force login protection
+# ---------------------------------------------------------------------------
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1  # hours
+AXES_LOCKOUT_PARAMETERS = ["username", "ip_address"]
+AXES_RESET_ON_SUCCESS = True
+
+# ---------------------------------------------------------------------------
+# Content Security Policy (django-csp) — Report-Only mode to start
+# ---------------------------------------------------------------------------
+CSP_REPORT_ONLY = True
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com", "https://*.stripe.com",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com",)
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com",)
+CSP_IMG_SRC = ("'self'", "data:",)
+CSP_CONNECT_SRC = ("'self'", "https://*.stripe.com",)
+
+# ---------------------------------------------------------------------------
+# Notifications — multi-channel (email + Telegram + Signal)
+# ---------------------------------------------------------------------------
+SITE_URL = config("SITE_URL", default="http://localhost:8000")
+
+# Telegram Bot (create via @BotFather; messages encrypted in transit via TLS)
+TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
+ADMIN_TELEGRAM_CHAT_ID = config("ADMIN_TELEGRAM_CHAT_ID", default="")
+
+# Signal Messenger (via signal-cli-rest-api Docker container; E2E encrypted)
+SIGNAL_CLI_REST_API_URL = config("SIGNAL_CLI_REST_API_URL", default="")
+SIGNAL_SENDER_NUMBER = config("SIGNAL_SENDER_NUMBER", default="")
+ADMIN_SIGNAL_NUMBER = config("ADMIN_SIGNAL_NUMBER", default="")
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "orders": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "tickets": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "notifications": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "users": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "api": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}

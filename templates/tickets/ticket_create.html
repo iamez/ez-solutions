@@ -1,69 +1,67 @@
-{% extends 'base.html' %}
-
-{% block title %}New Support Ticket — Tech-IT Solutions{% endblock %}
+{% extends "base.html" %}
+{% block title %}New Support Ticket — EZ Solutions{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-7">
-      <div class="d-flex align-items-center mb-4">
-        <a href="{% url 'tickets:list' %}" class="btn btn-sm btn-outline-secondary me-3">
-          <i class="bi bi-arrow-left"></i>
-        </a>
-        <div>
-          <h2 class="fw-bold mb-0">Open a Support Ticket</h2>
-          <p class="text-muted mb-0 small">We usually respond within 1 business day</p>
+<section class="bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="{% url 'tickets:list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Open a Support Ticket</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">We usually respond within 1 business day</p>
+            </div>
         </div>
-      </div>
 
-      <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4">
-          <form method="post" novalidate>
-            {% csrf_token %}
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <form method="post" novalidate class="space-y-4">
+                {% csrf_token %}
 
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger py-2 small">{{ form.non_field_errors }}</div>
-            {% endif %}
+                {% if form.non_field_errors %}
+                <div class="p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-700 dark:text-red-400">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
 
-            <!-- Subject -->
-            <div class="mb-3">
-              <label for="{{ form.subject.id_for_label }}" class="form-label fw-semibold">
-                Subject <span class="text-danger">*</span>
-              </label>
-              {{ form.subject }}
-              {% if form.subject.errors %}
-                <div class="invalid-feedback d-block small">{{ form.subject.errors }}</div>
-              {% endif %}
-            </div>
+                <div>
+                    <label for="{{ form.subject.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Subject <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="subject" id="{{ form.subject.id_for_label }}" value="{{ form.subject.value|default_if_none:'' }}"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white {% if form.subject.errors %}border-red-500{% endif %}">
+                    {% if form.subject.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.subject.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-            <!-- Priority -->
-            <div class="mb-3">
-              <label for="{{ form.priority.id_for_label }}" class="form-label fw-semibold">Priority</label>
-              {{ form.priority }}
-              <div class="form-text">Choose <strong>Urgent</strong> only for critical outages.</div>
-            </div>
+                <div>
+                    <label for="{{ form.priority.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Priority</label>
+                    <select name="priority" id="{{ form.priority.id_for_label }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        {% for value, label in form.priority.field.choices %}
+                        <option value="{{ value }}" {% if form.priority.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Choose <strong>Urgent</strong> only for critical outages.</p>
+                </div>
 
-            <!-- Body / description -->
-            <div class="mb-4">
-              <label for="id_body" class="form-label fw-semibold">
-                Description <span class="text-danger">*</span>
-              </label>
-              {{ form.body }}
-              {% if form.body.errors %}
-                <div class="invalid-feedback d-block small">{{ form.body.errors }}</div>
-              {% endif %}
-              <div class="form-text">{{ form.body.help_text }}</div>
-            </div>
+                <div>
+                    <label for="id_body" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Description <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="body" id="id_body" rows="6"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white {% if form.body.errors %}border-red-500{% endif %}">{{ form.body.value|default_if_none:'' }}</textarea>
+                    {% if form.body.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.body.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-lg fw-semibold">
-                <i class="bi bi-send me-2"></i>Submit Ticket
-              </button>
-            </div>
-          </form>
+                <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-3 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Submit Ticket
+                </button>
+            </form>
         </div>
-      </div>
     </div>
-  </div>
-</div>
+</section>
 {% endblock %}

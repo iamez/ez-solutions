@@ -21,13 +21,23 @@ def dashboard(request):
 
     # Active subscription (may not exist yet for free users)
     customer = getattr(user, "stripe_customer", None)
-    subscription = getattr(customer, "subscription", None) if customer else None
+    subscription = customer.get_active_subscription() if customer else None
+
+    # Active VPS instances
+    services = []
+    if customer:
+        from orders.models import VPSInstance
+        services = VPSInstance.objects.filter(
+            customer=customer,
+            status__in=["running", "stopped", "provisioning"],
+        ).select_related("provisioning_job")[:10]
 
     ctx = {
         "user": user,
         "total_tickets": total_tickets,
         "open_tickets": open_tickets,
         "subscription": subscription,
+        "services": services,
     }
     return render(request, "users/dashboard.html", ctx)
 

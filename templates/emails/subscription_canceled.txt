@@ -1,8 +1,12 @@
 Hi {{ name }},
 
-Your EZ Solutions subscription has been moved to the free tier.
+Your EZ Solutions subscription has been moved to the Free tier.
 
 If this was unexpected, please contact support and we can help.
 
 Thanks,
 EZ Solutions
+
+---
+To unsubscribe from these emails, visit: {{ unsubscribe_url }}
+Manage notification preferences: {{ preferences_url }}

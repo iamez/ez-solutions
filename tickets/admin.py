@@ -1,6 +1,7 @@
 """Admin registration for Support Tickets."""
 
 from django.contrib import admin
+from django.db.models import Count
 
 from .models import Ticket, TicketMessage
 
@@ -27,6 +28,7 @@ class TicketAdmin(admin.ModelAdmin):
     list_filter = ("status", "priority")
     search_fields = ("subject", "user__email", "reference")
     readonly_fields = ("reference", "reference_short", "created_at", "updated_at")
+    list_per_page = 25
     inlines = [TicketMessageInline]
     fieldsets = (
         (None, {"fields": ("reference_short", "user", "subject")}),
@@ -34,12 +36,17 @@ class TicketAdmin(admin.ModelAdmin):
         ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_msg_count=Count("messages"))
+
     @admin.display(description="Replies")
     def message_count(self, obj):
-        return obj.messages.count()
+        return obj._msg_count
 
     def save_formset(self, request, form, formset, change):
         """Auto-mark messages saved via admin as staff replies."""
+        for obj in formset.deleted_objects:
+            obj.delete()
         instances = formset.save(commit=False)
         for instance in instances:
             if isinstance(instance, TicketMessage):

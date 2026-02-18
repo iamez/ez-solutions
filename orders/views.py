@@ -19,8 +19,6 @@ from .webhooks import HANDLED_EVENTS, handle_event
 
 log = logging.getLogger(__name__)
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 
 # ---------------------------------------------------------------------------
 # Public / authenticated billing views
@@ -47,6 +45,7 @@ def billing(request):
 
 
 @login_required
+@require_POST
 def create_checkout_session(request, plan_slug):
     """Start a Stripe Checkout session for the given plan."""
     plan = get_object_or_404(ServicePlan, slug=plan_slug, is_active=True)
@@ -56,16 +55,20 @@ def create_checkout_session(request, plan_slug):
         return redirect("services:pricing")
 
     # Ensure a Stripe Customer record exists for this user
-    customer, _ = Customer.objects.get_or_create(
-        user=request.user,
-        defaults={"stripe_customer_id": _get_or_create_stripe_customer(request.user)},
-    )
+    try:
+        customer = Customer.objects.get(user=request.user)
+    except Customer.DoesNotExist:
+        customer = Customer.objects.create(
+            user=request.user,
+            stripe_customer_id=_get_or_create_stripe_customer(request.user),
+        )
 
     success_url = request.build_absolute_uri(reverse("orders:billing")) + "?checkout=success"
     cancel_url = request.build_absolute_uri(reverse("services:pricing"))
 
     try:
         session = stripe.checkout.Session.create(
+            api_key=settings.STRIPE_SECRET_KEY,
             customer=customer.stripe_customer_id,
             payment_method_types=["card"],
             line_items=[{"price": plan.stripe_price_id_monthly, "quantity": 1}],
@@ -94,6 +97,7 @@ def billing_portal(request):
     return_url = request.build_absolute_uri(reverse("orders:billing"))
     try:
         portal_session = stripe.billing_portal.Session.create(
+            api_key=settings.STRIPE_SECRET_KEY,
             customer=customer.stripe_customer_id,
             return_url=return_url,
         )
@@ -157,6 +161,7 @@ def stripe_webhook(request):
 def _get_or_create_stripe_customer(user) -> str:
     """Create a Stripe Customer object and return its ID."""
     stripe_customer = stripe.Customer.create(
+        api_key=settings.STRIPE_SECRET_KEY,
         email=user.email,
         name=user.full_name or user.email,
         metadata={"user_id": str(user.pk)},

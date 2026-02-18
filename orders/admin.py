@@ -40,6 +40,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = ("stripe_subscription_id", "customer__user__email")
     readonly_fields = ("stripe_subscription_id", "stripe_price_id", "created_at", "updated_at")
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("customer__user")
+
     @admin.display(description="User Email")
     def get_user_email(self, obj):
         return obj.customer.user.email
@@ -51,6 +54,7 @@ class PaymentEventAdmin(admin.ModelAdmin):
     list_filter = ("event_type",)
     search_fields = ("stripe_event_id", "event_type")
     readonly_fields = ("stripe_event_id", "event_type", "processed_at", "payload")
+    list_per_page = 25
 
     def has_add_permission(self, request):
         return False  # events are logged by webhooks only

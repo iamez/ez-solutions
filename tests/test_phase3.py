@@ -177,7 +177,7 @@ class TestCheckoutView:
             name="NoPricePlan", slug="no-price", price_monthly="0.00", is_active=True
         )
         url = reverse("orders:checkout", kwargs={"plan_slug": no_price_plan.slug})
-        resp = client_logged_in.get(url, follow=True)
+        resp = client_logged_in.post(url, follow=True)
         assert resp.status_code == 200
         # Should redirect to pricing page with error message
         pricing_url = reverse("services:pricing")
@@ -187,7 +187,7 @@ class TestCheckoutView:
         plan.is_active = False
         plan.save()
         url = reverse("orders:checkout", kwargs={"plan_slug": plan.slug})
-        resp = client_logged_in.get(url)
+        resp = client_logged_in.post(url)
         assert resp.status_code == 404
 
     @patch("orders.views.stripe.checkout.Session.create")
@@ -202,7 +202,7 @@ class TestCheckoutView:
         mock_session_create.return_value = MagicMock(url="https://checkout.stripe.com/session/xyz")
 
         url = reverse("orders:checkout", kwargs={"plan_slug": plan.slug})
-        resp = client_logged_in.get(url)
+        resp = client_logged_in.post(url)
         assert resp.status_code == 302
 
 

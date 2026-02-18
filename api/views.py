@@ -4,8 +4,10 @@ from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_seriali
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
+from django.db import transaction
 from services.models import ServicePlan
 from tickets.models import Ticket, TicketMessage, TicketPriority, TicketStatus
 
@@ -17,6 +19,14 @@ from .serializers import (
     TicketReplySerializer,
     TicketSerializer,
 )
+
+
+class TicketCreateThrottle(UserRateThrottle):
+    scope = "ticket_create"
+
+
+class JWTAuthThrottle(UserRateThrottle):
+    scope = "jwt_auth"
 
 # ---------------------------------------------------------------------------
 # Health
@@ -58,7 +68,7 @@ class PlanListView(APIView):
         responses=ServicePlanSerializer(many=True),
     )
     def get(self, request):
-        plans = ServicePlan.objects.filter(is_active=True)
+        plans = ServicePlan.objects.filter(is_active=True).prefetch_related("features")
         serializer = ServicePlanSerializer(plans, many=True)
         return Response(serializer.data)
 
@@ -75,6 +85,11 @@ class TicketListCreateView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
+
+    def get_throttles(self):
+        if self.request.method == "POST":
+            return [TicketCreateThrottle()]
+        return super().get_throttles()
 
     @extend_schema(
         operation_id="v1_tickets_list",
@@ -102,18 +117,19 @@ class TicketListCreateView(APIView):
             "high": TicketPriority.HIGH,
             "urgent": TicketPriority.URGENT,
         }
-        ticket = Ticket.objects.create(
-            user=request.user,
-            subject=data["subject"],
-            status=TicketStatus.OPEN,
-            priority=priority_map.get(data.get("priority", "normal"), TicketPriority.NORMAL),
-        )
-        TicketMessage.objects.create(
-            ticket=ticket,
-            sender=request.user,
-            body=data["body"],
-            is_staff_reply=False,
-        )
+        with transaction.atomic():
+            ticket = Ticket.objects.create(
+                user=request.user,
+                subject=data["subject"],
+                status=TicketStatus.OPEN,
+                priority=priority_map.get(data.get("priority", "normal"), TicketPriority.NORMAL),
+            )
+            TicketMessage.objects.create(
+                ticket=ticket,
+                sender=request.user,
+                body=data["body"],
+                is_staff_reply=False,
+            )
         out = TicketSerializer(ticket)
         return Response(out.data, status=status.HTTP_201_CREATED)
 

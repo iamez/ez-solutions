@@ -1,105 +1,87 @@
-{% extends 'base.html' %}
-
-{% block title %}Ticket #{{ ticket.reference_short }} — Tech-IT Solutions{% endblock %}
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.reference_short }} — EZ Solutions{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-
-      <!-- Header -->
-      <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
-        <div class="d-flex align-items-center flex-wrap gap-2">
-          <a href="{% url 'tickets:list' %}" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i>
-          </a>
-          <div>
-            <h2 class="fw-bold mb-0">{{ ticket.subject }}</h2>
-            <p class="text-muted mb-0 small">
-              Ticket <span class="fw-semibold">#{{ ticket.reference_short }}</span>
-              &middot; Opened {{ ticket.created_at|date:"N j, Y" }}
-            </p>
-          </div>
-        </div>
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-          {% if ticket.priority == "urgent" %}
-            <span class="badge bg-danger">Urgent</span>
-          {% elif ticket.priority == "high" %}
-            <span class="badge bg-warning text-dark">High</span>
-          {% elif ticket.priority == "normal" %}
-            <span class="badge bg-secondary">Normal</span>
-          {% else %}
-            <span class="badge bg-light text-dark border">Low</span>
-          {% endif %}
-          {% if ticket.status == "open" %}
-            <span class="badge bg-success">Open</span>
-          {% elif ticket.status == "in_progress" %}
-            <span class="badge bg-primary">In Progress</span>
-          {% elif ticket.status == "waiting" %}
-            <span class="badge bg-warning text-dark">Waiting on You</span>
-          {% elif ticket.status == "resolved" %}
-            <span class="badge bg-info text-dark">Resolved</span>
-          {% else %}
-            <span class="badge bg-secondary">Closed</span>
-          {% endif %}
-        </div>
-      </div>
-
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-3">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-
-      <!-- Message thread -->
-      <div class="mb-4">
-        {% for msg in thread %}
-          <div class="card border-0 rounded-4 mb-3 {% if msg.is_staff_reply %}bg-primary-subtle{% else %}bg-white shadow-sm{% endif %}">
-            <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-semibold small">
-                  {% if msg.is_staff_reply %}
-                    <i class="bi bi-headset text-primary me-1"></i>Tech-IT Support
-                  {% else %}
-                    <i class="bi bi-person-circle me-1"></i>{{ msg.sender.full_name|default:msg.sender.email }}
-                  {% endif %}
-                </span>
-                <span class="text-muted small">{{ msg.created_at|date:"N j, Y g:i A" }}</span>
-              </div>
-              <p class="mb-0" style="white-space: pre-wrap;">{{ msg.body }}</p>
+<section class="bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+            <div class="flex items-start gap-3">
+                <a href="{% url 'tickets:list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ ticket.subject }}</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">
+                        Ticket <span class="font-semibold">#{{ ticket.reference_short }}</span> · Opened {{ ticket.created_at|date:"N j, Y" }}
+                    </p>
+                </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
+            <div class="flex gap-2 items-center flex-wrap">
+                {% if ticket.priority == "urgent" %}
+                <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Urgent</span>
+                {% elif ticket.priority == "high" %}
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">High</span>
+                {% elif ticket.priority == "normal" %}
+                <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">Normal</span>
+                {% else %}
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Low</span>
+                {% endif %}
 
-      <!-- Reply form -->
-      {% if ticket.is_open %}
-        <div class="card border-0 shadow-sm rounded-4">
-          <div class="card-body p-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-reply me-1 text-primary"></i>Add a Reply</h6>
-            <form method="post">
-              {% csrf_token %}
-              {{ reply_form.body }}
-              {% if reply_form.body.errors %}
-                <div class="invalid-feedback d-block small mt-1">{{ reply_form.body.errors }}</div>
-              {% endif %}
-              <div class="mt-3">
-                <button type="submit" class="btn btn-primary fw-semibold">
-                  <i class="bi bi-send me-1"></i>Send Reply
+                {% if ticket.status == "open" %}
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Open</span>
+                {% elif ticket.status == "in_progress" %}
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">In Progress</span>
+                {% elif ticket.status == "waiting" %}
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">Waiting on You</span>
+                {% elif ticket.status == "resolved" %}
+                <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">Resolved</span>
+                {% else %}
+                <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">Closed</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Message Thread -->
+        <div class="space-y-4 mb-6">
+            {% for msg in thread %}
+            <div class="{% if msg.is_staff_reply %}bg-primary-50 dark:bg-gray-700{% else %}bg-white dark:bg-gray-800{% endif %} rounded-lg shadow-sm p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-semibold {% if msg.is_staff_reply %}text-primary-700 dark:text-primary-400{% else %}text-gray-900 dark:text-white{% endif %}">
+                        {% if msg.is_staff_reply %}
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg>
+                        EZ Solutions Support
+                        {% else %}
+                        {{ msg.sender.full_name|default:msg.sender.email }}
+                        {% endif %}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ msg.created_at|date:"N j, Y g:i A" }}</span>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ msg.body }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Reply Form -->
+        {% if ticket.is_open %}
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h6 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Add a Reply</h6>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <textarea name="body" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Type your reply...">{{ reply_form.body.value|default_if_none:'' }}</textarea>
+                {% if reply_form.body.errors %}
+                <p class="text-sm text-red-600 dark:text-red-400">{{ reply_form.body.errors.0 }}</p>
+                {% endif %}
+                <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Send Reply
                 </button>
-              </div>
             </form>
-          </div>
         </div>
-      {% else %}
-        <div class="alert alert-secondary rounded-4 text-center">
-          <i class="bi bi-lock me-2"></i>This ticket is closed.
-          <a href="{% url 'tickets:create' %}" class="alert-link">Open a new ticket</a> if you need further help.
+        {% else %}
+        <div class="p-4 text-sm text-gray-800 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 text-center">
+            This ticket is closed. <a href="{% url 'tickets:create' %}" class="font-medium text-primary-600 hover:underline dark:text-primary-400">Open a new ticket</a> if you need further help.
         </div>
-      {% endif %}
-
+        {% endif %}
     </div>
-  </div>
-</div>
+</section>
 {% endblock %}

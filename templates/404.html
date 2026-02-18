@@ -2,32 +2,28 @@
 {% block title %}Page Not Found — EZ Solutions{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="mb-4">
-        <i class="bi bi-map text-primary" style="font-size: 5rem;"></i>
-      </div>
-      <h1 class="display-1 fw-bold text-primary">404</h1>
-      <h2 class="h3 mb-3">Page Not Found</h2>
-      <p class="text-muted mb-4">
-        The page you're looking for doesn't exist or has been moved.
-      </p>
-      <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{% url 'home:index' %}" class="btn btn-primary btn-lg">
-          <i class="bi bi-house me-2"></i>Go Home
-        </a>
-        {% if user.is_authenticated %}
-        <a href="{% url 'users:dashboard' %}" class="btn btn-outline-primary btn-lg">
-          <i class="bi bi-grid me-2"></i>Dashboard
-        </a>
-        {% else %}
-        <a href="{% url 'tickets:create' %}" class="btn btn-outline-primary btn-lg">
-          <i class="bi bi-headset me-2"></i>Get Help
-        </a>
-        {% endif %}
-      </div>
+<section class="bg-white dark:bg-gray-900 min-h-[60vh] flex items-center justify-center py-16 px-4">
+    <div class="text-center max-w-md mx-auto">
+        <svg class="w-20 h-20 mx-auto mb-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+        </svg>
+        <h1 class="text-8xl font-extrabold text-primary-600 dark:text-primary-500 mb-4">404</h1>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Page Not Found</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">The page you're looking for doesn't exist or has been moved.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{% url 'home:index' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                Go Home
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'users:dashboard' %}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'tickets:create' %}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                Get Help
+            </a>
+            {% endif %}
+        </div>
     </div>
-  </div>
-</div>
+</section>
 {% endblock %}

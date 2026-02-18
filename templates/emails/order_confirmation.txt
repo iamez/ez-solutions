@@ -8,3 +8,7 @@ You can manage billing anytime from your dashboard billing portal.
 
 Thanks,
 EZ Solutions
+
+---
+To unsubscribe from these emails, visit: {{ unsubscribe_url }}
+Manage notification preferences: {{ preferences_url }}

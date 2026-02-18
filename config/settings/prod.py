@@ -12,7 +12,18 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 X_FRAME_OPTIONS = "DENY"
+
+# Enforce CSP in production (report-only is only for dev)
+CSP_REPORT_ONLY = False
+
+# Require email verification in production
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+# Session security
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = True  # sliding window
 
 # CSRF trusted origins (add your real domain(s) here)
 CSRF_TRUSTED_ORIGINS = config(  # noqa: F405
@@ -33,13 +44,16 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())  # noqa: F405
 
 # Sentry
-if SENTRY_DSN:  # noqa: F405
-    import sentry_sdk
-    from sentry_sdk.integrations.django import DjangoIntegration
+try:
+    if SENTRY_DSN:  # noqa: F405
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
 
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,  # noqa: F405
-        integrations=[DjangoIntegration()],
-        traces_sample_rate=0.2,
-        send_default_pii=False,
-    )
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,  # noqa: F405
+            integrations=[DjangoIntegration()],
+            traces_sample_rate=0.2,
+            send_default_pii=False,
+        )
+except (ImportError, Exception):  # noqa: BLE001
+    pass  # sentry-sdk not installed or config error

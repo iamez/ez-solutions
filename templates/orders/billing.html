@@ -1,118 +1,104 @@
-{% extends 'base.html' %}
-
-{% block title %}Billing — Tech-IT Solutions{% endblock %}
+{% extends "base.html" %}
+{% block title %}Billing — EZ Solutions{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row">
-    <div class="col-lg-8">
-
-      <!-- Page header -->
-      <div class="d-flex align-items-center mb-4">
-        <a href="{% url 'users:dashboard' %}" class="btn btn-sm btn-outline-secondary me-3">
-          <i class="bi bi-arrow-left"></i>
-        </a>
-        <div>
-          <h2 class="fw-bold mb-0">Billing &amp; Subscription</h2>
-          <p class="text-muted mb-0 small">Manage your plan and payment details</p>
-        </div>
-      </div>
-
-      <!-- Success message after checkout -->
-      {% if request.GET.checkout == "success" %}
-        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-          <i class="bi bi-check-circle-fill me-2"></i>
-          <strong>Welcome aboard!</strong> Your subscription is now active. It may take a moment to update.
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endif %}
-
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-
-      <!-- Current plan card -->
-      <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-4">
-          <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge-fill text-primary me-2"></i>Current Plan</h5>
-
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+<section class="bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <a href="{% url 'users:dashboard' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
             <div>
-              <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 fs-6">
-                {{ request.user.get_subscription_tier_display }}
-              </span>
-              {% if subscription %}
-                <p class="text-muted small mt-2 mb-0">
-                  Status:
-                  {% if subscription.is_active %}
-                    <span class="text-success fw-semibold">Active</span>
-                  {% elif subscription.is_past_due %}
-                    <span class="text-warning fw-semibold">Past Due — please update your payment method</span>
-                  {% else %}
-                    <span class="text-danger fw-semibold">{{ subscription.get_status_display }}</span>
-                  {% endif %}
-                </p>
-                {% if subscription.current_period_end %}
-                  <p class="text-muted small mb-0">
-                    {% if subscription.cancel_at_period_end %}
-                      Cancels on {{ subscription.current_period_end|date:"N j, Y" }}
-                    {% else %}
-                      Renews on {{ subscription.current_period_end|date:"N j, Y" }}
-                      ({{ subscription.days_until_renewal }} day{{ subscription.days_until_renewal|pluralize }} away)
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Billing &amp; Subscription</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Manage your plan and payment details</p>
+            </div>
+        </div>
+
+        {% if request.GET.checkout == "success" %}
+        <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 flex items-center gap-2" role="alert">
+            <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <span><strong>Welcome aboard!</strong> Your subscription is now active. It may take a moment to update.</span>
+        </div>
+        {% endif %}
+
+        <!-- Current Plan -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
+            <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-primary-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+                Current Plan
+            </h5>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <span class="bg-primary-100 text-primary-800 text-sm font-semibold px-3 py-1 rounded dark:bg-primary-900 dark:text-primary-300">
+                        {{ request.user.get_subscription_tier_display }}
+                    </span>
+                    {% if subscription %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                        Status:
+                        {% if subscription.is_active %}
+                        <span class="text-green-600 font-semibold">Active</span>
+                        {% elif subscription.is_past_due %}
+                        <span class="text-yellow-600 font-semibold">Past Due — please update your payment method</span>
+                        {% else %}
+                        <span class="text-red-600 font-semibold">{{ subscription.get_status_display }}</span>
+                        {% endif %}
+                    </p>
+                    {% if subscription.current_period_end %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {% if subscription.cancel_at_period_end %}
+                        Cancels on {{ subscription.current_period_end|date:"N j, Y" }}
+                        {% else %}
+                        Renews on {{ subscription.current_period_end|date:"N j, Y" }}
+                        ({{ subscription.days_until_renewal }} day{{ subscription.days_until_renewal|pluralize }} away)
+                        {% endif %}
+                    </p>
                     {% endif %}
-                  </p>
-                {% endif %}
-              {% else %}
-                <p class="text-muted small mt-2 mb-0">You are on the free tier.</p>
-              {% endif %}
+                    {% else %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">You are on the free tier.</p>
+                    {% endif %}
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    {% if subscription %}
+                    <a href="{% url 'orders:billing_portal' %}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-4 py-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">
+                        Manage Subscription
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'services:pricing' %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                        {% if request.user.is_paid %}Change Plan{% else %}Upgrade{% endif %}
+                    </a>
+                </div>
             </div>
+        </div>
 
-            <div class="d-flex gap-2 flex-wrap">
-              {% if subscription %}
-                <a href="{% url 'orders:billing_portal' %}" class="btn btn-outline-secondary btn-sm">
-                  <i class="bi bi-gear me-1"></i>Manage Subscription
+        <!-- Payment Method -->
+        {% if subscription %}
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Payment Method</h5>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Managed securely via Stripe</p>
+                </div>
+                <a href="{% url 'orders:billing_portal' %}" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 text-sm font-medium">
+                    Update →
                 </a>
-              {% endif %}
-              <a href="{% url 'services:pricing' %}" class="btn btn-primary btn-sm">
-                <i class="bi bi-arrow-up-circle me-1"></i>
-                {% if request.user.is_paid %}Change Plan{% else %}Upgrade{% endif %}
-              </a>
             </div>
-          </div>
         </div>
-      </div>
+        {% endif %}
 
-      <!-- Payment method / portal -->
-      {% if subscription %}
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-          <div class="card-body p-4">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <h5 class="fw-bold mb-1"><i class="bi bi-credit-card me-2 text-muted"></i>Payment Method</h5>
-                <p class="text-muted small mb-0">Managed securely via Stripe</p>
-              </div>
-              <a href="{% url 'orders:billing_portal' %}" class="btn btn-outline-secondary btn-sm">
-                Update <i class="bi bi-box-arrow-up-right ms-1"></i>
-              </a>
-            </div>
-          </div>
+        <!-- No subscription CTA -->
+        {% if not subscription and not request.user.is_paid %}
+        <div class="bg-primary-50 dark:bg-gray-800 rounded-lg p-8 text-center border border-primary-100 dark:border-gray-700">
+            <svg class="w-12 h-12 mx-auto text-primary-600 dark:text-primary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+            </svg>
+            <h5 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to unlock more?</h5>
+            <p class="text-gray-500 dark:text-gray-400 mb-4">Choose a plan and get started in minutes — no credit card needed for the trial.</p>
+            <a href="{% url 'services:pricing' %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                View Plans
+            </a>
         </div>
-      {% endif %}
-
-      <!-- No subscription yet -->
-      {% if not subscription and not request.user.is_paid %}
-        <div class="card border-0 bg-primary-subtle rounded-4 p-4 text-center">
-          <i class="bi bi-rocket-takeoff fs-1 text-primary mb-3 d-block"></i>
-          <h5 class="fw-bold">Ready to unlock more?</h5>
-          <p class="text-muted mb-3">Choose a plan and get started in minutes — no credit card needed for the trial.</p>
-          <a href="{% url 'services:pricing' %}" class="btn btn-primary fw-semibold px-4">View Plans</a>
-        </div>
-      {% endif %}
-
+        {% endif %}
     </div>
-  </div>
-</div>
+</section>
 {% endblock %}

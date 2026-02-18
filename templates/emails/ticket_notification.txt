@@ -1,0 +1,15 @@
+Hi {{ name }},
+
+There's a new reply on your ticket: {{ ticket_subject }}
+
+{{ message_body }}
+
+View the full thread:
+{{ ticket_url }}
+
+Thanks,
+EZ Solutions
+
+---
+To unsubscribe from these emails, visit: {{ unsubscribe_url }}
+Manage notification preferences: {{ preferences_url }}

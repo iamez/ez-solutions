@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Preferences — EZ Solutions{% endblock %}
+
+{% block content %}
+<section class="bg-white dark:bg-gray-900">
+  <div class="max-w-2xl px-4 py-8 mx-auto lg:py-16">
+    <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Notification Preferences</h2>
+    <p class="mb-6 text-gray-500 dark:text-gray-400">Choose how you'd like to receive notifications from EZ Solutions.</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="space-y-6">
+        <!-- Email -->
+        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Email</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Receive notifications at {{ request.user.email }}</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" name="email_enabled" class="sr-only peer" {% if prefs.email_enabled %}checked{% endif %}>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+          </label>
+        </div>
+
+        <!-- Telegram -->
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Telegram</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Get instant notifications via Telegram bot</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="telegram_enabled" class="sr-only peer" {% if prefs.telegram_enabled %}checked{% endif %}>
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+            </label>
+          </div>
+          <div>
+            <label for="telegram_chat_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Chat ID</label>
+            <input type="text" name="telegram_chat_id" id="telegram_chat_id" value="{{ prefs.telegram_chat_id }}" placeholder="Your Telegram chat ID" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Start our bot and send /start to get your chat ID.</p>
+          </div>
+        </div>
+
+        <!-- Signal -->
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Signal</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">End-to-end encrypted notifications via Signal</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="signal_enabled" class="sr-only peer" {% if prefs.signal_enabled %}checked{% endif %}>
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+            </label>
+          </div>
+          <div>
+            <label for="signal_phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone Number</label>
+            <input type="tel" name="signal_phone" id="signal_phone" value="{{ prefs.signal_phone }}" placeholder="+1234567890" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">E.164 format (e.g., +1234567890)</p>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="mt-6 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+        Save Preferences
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

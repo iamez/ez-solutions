@@ -1,0 +1,16 @@
+Hi {{ name }},
+
+Welcome to EZ Solutions! Your account is ready.
+
+Get started by exploring our services:
+{{ dashboard_url }}
+
+Or check out our plans:
+{{ pricing_url }}
+
+Thanks,
+EZ Solutions
+
+---
+To unsubscribe from these emails, visit: {{ unsubscribe_url }}
+Manage notification preferences: {{ preferences_url }}

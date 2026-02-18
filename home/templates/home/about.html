@@ -1,28 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>About EZ Solutions</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <header>
-        <h1>About EZ Solutions</h1>
-    </header>
-    <section>
-        <h2>Who We Are</h2>
-        <p>EZ Solutions is a tech-driven company founded by E.Z., dedicated to delivering top-tier IT services and support. Our team combines expertise, passion, and creativity to solve your technology challenges.</p>
-    </section>
-    <section>
-        <h2>Our Mission</h2>
-        <p>To empower businesses and individuals with secure, scalable, and easy-to-use technology solutions.</p>
-    </section>
-    <section>
-        <h2>Contact</h2>
-        <p>Email: support@ezsolutions.com</p>
-    </section>
-    <footer>
-        <a href="/">Home</a>
-    </footer>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About — EZ Solutions{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="bg-white dark:bg-gray-900 py-16 px-4">
+    <div class="max-w-screen-xl mx-auto text-center">
+        <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-4 lg:text-5xl">
+            About EZ Solutions
+        </h1>
+        <p class="max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">
+            We're a tech-driven company dedicated to delivering top-tier IT services, cloud hosting, and managed solutions for businesses of all sizes.
+        </p>
+    </div>
+</section>
+
+<!-- Mission / Values -->
+<section class="bg-gray-50 dark:bg-gray-800 py-16 px-4">
+    <div class="max-w-screen-xl mx-auto">
+        <div class="grid gap-8 md:grid-cols-3">
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
+                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white">Our Mission</h3>
+                <p class="text-gray-500 dark:text-gray-400">To empower businesses and individuals with secure, scalable, and easy-to-use technology solutions. We believe great infrastructure should be accessible to everyone.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-green-100 dark:bg-green-900">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white">Reliability First</h3>
+                <p class="text-gray-500 dark:text-gray-400">99.9% uptime guaranteed. Our infrastructure is monitored 24/7 with automated health checks, redundant systems, and instant failover capabilities.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white">Human Support</h3>
+                <p class="text-gray-500 dark:text-gray-400">Real people, real answers. Our support team responds within 1 business day and treats every ticket with the care it deserves.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What We Offer -->
+<section class="bg-white dark:bg-gray-900 py-16 px-4">
+    <div class="max-w-screen-xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">What We Offer</h2>
+            <p class="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">Everything you need to launch, scale, and manage your online presence.</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div class="text-center">
+                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-primary-600 dark:text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-1">VPS Hosting</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">High-performance virtual private servers deployed in seconds.</p>
+            </div>
+            <div class="text-center">
+                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Web Hosting</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Managed hosting with cPanel, SSL certificates, and email.</p>
+            </div>
+            <div class="text-center">
+                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Managed Services</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">We handle the infrastructure so you can focus on your business.</p>
+            </div>
+            <div class="text-center">
+                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-1">24/7 Support</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Ticket-based support with priority response for paid plans.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA -->
+<section class="bg-gray-50 dark:bg-gray-800 py-12 px-4">
+    <div class="max-w-screen-sm mx-auto text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">Get in Touch</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">Have questions? We'd love to hear from you.</p>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+            <span class="font-medium">Email:</span>
+            <a href="mailto:support@ezsolutions.com" class="text-primary-600 hover:underline dark:text-primary-400">support@ezsolutions.com</a>
+        </p>
+        <div class="flex gap-3 justify-center">
+            <a href="{% url 'tickets:create' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                Open a Ticket
+            </a>
+            <a href="{% url 'services:pricing' %}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                View Pricing
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

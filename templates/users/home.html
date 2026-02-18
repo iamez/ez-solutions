@@ -1,386 +1,147 @@
-﻿{% extends 'base.html' %}
+﻿{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Tech-IT Solutions  Reliable Hosting & Managed IT{% endblock %}
+{% block title %}Managed Cloud Hosting & IT Services — EZ Solutions{% endblock %}
 
 {% block content %}
-
-<!-- Hero -->
-<section class="py-5" style="background: linear-gradient(135deg, #1a56db 0%, #0e4bbd 100%); color: #fff; min-height: 480px;">
-  <div class="container py-4">
-    <div class="row align-items-center g-5">
-      <!-- Copy -->
-      <div class="col-lg-6">
-        <span class="badge bg-white text-primary fw-semibold px-3 py-2 mb-3 d-inline-block">
-          <i class="bi bi-patch-check-fill me-1"></i> Trusted by 10,000+ businesses
-        </span>
-        <h1 class="display-4 fw-bold lh-sm mb-4">
-          Modern IT Solutions<br>
-          <span style="color: #93c5fd;">Built for Your Business</span>
-        </h1>
-        <p class="lead mb-5" style="opacity: .9;">
-          Web hosting, managed cloud, and proactive IT support  all under one roof.
-          99.9% uptime SLA, 24/7 expert support, no long-term contracts.
-        </p>
-        <div class="d-flex gap-3 flex-wrap">
-          <a href="{% url 'account_signup' %}" class="btn btn-light btn-lg fw-bold px-4 shadow">Start Free Trial</a>
-          <a href="{% url 'services:pricing' %}" class="btn btn-outline-light btn-lg px-4">See Pricing <i class="bi bi-arrow-right ms-1"></i></a>
+<!-- Hero Section -->
+<section class="bg-white dark:bg-gray-900 border-b dark:border-gray-800">
+    <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
+        <div class="mr-auto place-self-center lg:col-span-7">
+            <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+                Reliable Cloud Hosting & <br>
+                <span class="text-primary-600 dark:text-primary-500">Managed IT Services</span>
+            </h1>
+            <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
+                Deploy VPS, dedicated servers, and managed applications in seconds. We handle the infrastructure so you can focus on your business. Enterprise-grade performance at startup prices.
+            </p>
+            <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                <a href="{% url 'services:pricing' %}" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
+                    View Pricing
+                    <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </a>
+                <a href="{% url 'home:about' %}" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                    Learn More
+                </a>
+            </div>
+            
+            <!-- Trust Badges -->
+            <div class="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800 flex items-center gap-4 text-gray-500 text-sm font-medium">
+                <div class="flex items-center gap-1">
+                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    99.9% Uptime
+                </div>
+                <div class="flex items-center gap-1">
+                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    24/7 Support
+                </div>
+                <div class="flex items-center gap-1">
+                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    Secure by Default
+                </div>
+            </div>
         </div>
-      </div>
-      <!-- Graphic  Bootstrap Icons only, no external image URL -->
-      <div class="col-lg-6 d-none d-lg-flex justify-content-center align-items-center">
-        <div class="position-relative" style="width:320px;height:320px;">
-          <div class="d-flex align-items-center justify-content-center rounded-circle"
-               style="width:320px;height:320px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);">
-            <i class="bi bi-lightning-charge-fill" style="font-size:9rem;color:#93c5fd;"></i>
-          </div>
-          <div class="position-absolute top-0 start-0 bg-white rounded-3 shadow px-3 py-2 text-dark fw-semibold small" style="transform:translate(-10px,40px);">
-            <i class="bi bi-shield-check text-success me-1"></i> 99.9% Uptime
-          </div>
-          <div class="position-absolute bottom-0 end-0 bg-white rounded-3 shadow px-3 py-2 text-dark fw-semibold small" style="transform:translate(10px,-40px);">
-            <i class="bi bi-headset text-primary me-1"></i> 24/7 Support
-          </div>
-          <div class="position-absolute top-50 end-0 bg-white rounded-3 shadow px-3 py-2 text-dark fw-semibold small" style="transform:translate(30px,-50%);">
-            <i class="bi bi-graph-up-arrow text-success me-1"></i> Scale Instantly
-          </div>
+        <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
+            <div class="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
+                <div class="h-[32px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[72px] rounded-l-lg"></div>
+                <div class="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
+                <div class="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
+                <div class="h-[64px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
+                <!-- Screen content -->
+                <div class="rounded-[2rem] overflow-hidden h-[572px] w-[272px] bg-gray-50 flex items-center justify-center">
+                    <div class="text-center p-4">
+                       <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0 1 1 0 002 0z"/>
+                        </svg>
+                       <p class="text-gray-500 text-sm">Mobile Dashboard Preview</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    <!-- Stats bar -->
-    <div class="row g-3 mt-4">
-      <div class="col-6 col-md-3">
-        <div class="bg-white bg-opacity-10 rounded-3 px-3 py-2 text-center">
-          <i class="bi bi-people-fill me-2"></i><span class="fw-semibold">10,000+ Customers</span>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="bg-white bg-opacity-10 rounded-3 px-3 py-2 text-center">
-          <i class="bi bi-shield-check me-2"></i><span class="fw-semibold">99.9% Uptime SLA</span>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="bg-white bg-opacity-10 rounded-3 px-3 py-2 text-center">
-          <i class="bi bi-headset me-2"></i><span class="fw-semibold">24/7 Expert Support</span>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="bg-white bg-opacity-10 rounded-3 px-3 py-2 text-center">
-          <i class="bi bi-arrow-counterclockwise me-2"></i><span class="fw-semibold">30-Day Money Back</span>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- Services -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 mb-2">What We Offer</span>
-      <h2 class="fw-bold display-6">Everything your business needs</h2>
-      <p class="text-muted">One provider. All the IT infrastructure your business can grow on.</p>
+<!-- Features Section -->
+<section class="bg-gray-50 dark:bg-gray-800 py-16">
+    <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-16">
+        <div class="text-center mb-16">
+            <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 lg:text-4xl dark:text-white">Designed for business teams like yours</h2>
+            <p class="font-light text-gray-500 sm:text-xl dark:text-gray-400">Everything you need to launch, scale, and manage your infrastructure.</p>
+        </div>
+        
+        <div class="grid gap-8 md:grid-cols-3">
+            <!-- Feature 1 -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
+                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L8.586 10 5.293 6.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white">Developer API</h3>
+                <p class="text-gray-500 dark:text-gray-400">Full REST API access to manage your resources programmatically. Automate deployments and scaling.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
+                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white">Admin Dashboard</h3>
+                <p class="text-gray-500 dark:text-gray-400">Comprehensive control panel for user management, billing, and support tickets.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
+                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold dark:text-white">Automated Provisioning</h3>
+                <p class="text-gray-500 dark:text-gray-400">Instant setup for VPS and services. No waiting for manual approval.</p>
+            </div>
+        </div>
     </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card service-card h-100 border-0 shadow-sm rounded-4 p-2">
-          <div class="card-body text-center p-4">
-            <div class="mb-4 mx-auto rounded-4 d-flex align-items-center justify-content-center" style="width:72px;height:72px;background:linear-gradient(135deg,#1a56db,#0e4bbd);">
-              <i class="bi bi-globe2 text-white fs-2"></i>
-            </div>
-            <h4 class="fw-bold mb-2">Web Hosting</h4>
-            <p class="text-muted mb-3">Lightning-fast SSD storage, free SSL on every plan, and daily automated backups.</p>
-            <ul class="list-unstyled text-start mb-4 small">
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>NVMe SSD Storage</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Free SSL Certificate</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Daily Backups</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>1-click WordPress install</li>
-            </ul>
-            <a href="{% url 'services:pricing' %}" class="btn btn-outline-primary w-100">View Plans</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card service-card h-100 border-0 shadow-sm rounded-4 p-2">
-          <div class="card-body text-center p-4">
-            <div class="mb-4 mx-auto rounded-4 d-flex align-items-center justify-content-center" style="width:72px;height:72px;background:linear-gradient(135deg,#059669,#10b981);">
-              <i class="bi bi-server text-white fs-2"></i>
-            </div>
-            <h4 class="fw-bold mb-2">VPS &amp; Cloud</h4>
-            <p class="text-muted mb-3">Scalable virtual servers with full root access and 24/7 monitoring.</p>
-            <ul class="list-unstyled text-start mb-4 small">
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated vCPU &amp; RAM</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Full Root Access</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>24/7 Infrastructure Monitoring</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Auto-scaling available</li>
-            </ul>
-            <a href="{% url 'services:pricing' %}" class="btn btn-outline-success w-100">View Plans</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card service-card h-100 border-0 shadow-sm rounded-4 p-2">
-          <div class="card-body text-center p-4">
-            <div class="mb-4 mx-auto rounded-4 d-flex align-items-center justify-content-center" style="width:72px;height:72px;background:linear-gradient(135deg,#7c3aed,#8b5cf6);">
-              <i class="bi bi-person-gear text-white fs-2"></i>
-            </div>
-            <h4 class="fw-bold mb-2">Managed IT</h4>
-            <p class="text-muted mb-3">We handle your entire IT stack so you can focus on running your business.</p>
-            <ul class="list-unstyled text-start mb-4 small">
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Proactive Monitoring</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Security Audits</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Disaster Recovery Planning</li>
-              <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated Account Manager</li>
-            </ul>
-            <a href="{% url 'services:pricing' %}" class="btn btn-outline-secondary w-100">View Plans</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- Pricing preview -->
-<section class="py-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <span class="badge bg-success-subtle text-success fw-semibold px-3 py-2 mb-2">Simple Pricing</span>
-      <h2 class="fw-bold display-6">Transparent plans, no surprises</h2>
-      <p class="text-muted">All plans include a 14-day free trial. No credit card required.</p>
-    </div>
-    {% if plans %}
-      <div class="row g-4 justify-content-center">
-        {% for plan in plans %}
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 rounded-4 {% if plan.is_featured %}shadow-lg{% else %}shadow-sm{% endif %}"
-                 style="{% if plan.is_featured %}border: 2px solid #1a56db !important;{% endif %}">
-              {% if plan.is_featured %}
-                <div class="card-header text-center bg-primary text-white rounded-top-4 py-2 border-0">
-                  <span class="fw-semibold small"><i class="bi bi-star-fill me-1"></i>Most Popular</span>
+<!-- Pricing Section -->
+<section class="bg-white dark:bg-gray-900 py-16">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+        <div class="mx-auto max-w-screen-md text-center mb-8 lg:mb-12">
+            <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Flexible Plans</h2>
+            <p class="mb-5 font-light text-gray-500 sm:text-xl dark:text-gray-400">Choose the plan that fits your business needs.</p>
+        </div>
+        <div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
+            {% for plan in plans %}
+            <!-- Pricing Card -->
+            <div class="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white w-full transform hover:scale-105 transition-transform duration-300">
+                <h3 class="mb-4 text-2xl font-semibold">{{ plan.name }}</h3>
+                <p class="font-light text-gray-500 sm:text-lg dark:text-gray-400">Best for {{ plan.slug|title }} Usage</p>
+                <div class="flex justify-center items-baseline my-8">
+                    <span class="mr-2 text-5xl font-extrabold">${{ plan.price_monthly }}</span>
+                    <span class="text-gray-500 dark:text-gray-400">/mo</span>
                 </div>
-              {% endif %}
-              <div class="card-body p-4 d-flex flex-column">
-                <h4 class="fw-bold mb-1">{{ plan.name }}</h4>
-                {% if plan.tagline %}<p class="text-muted small mb-3">{{ plan.tagline }}</p>{% endif %}
-                <div class="mb-4">
-                  <span class="fs-1 fw-bold">${{ plan.price_monthly }}</span>
-                  <span class="text-muted">/mo</span>
-                </div>
-                <ul class="list-unstyled mb-4 flex-grow-1">
-                  {% for feature in plan.features.all|slice:":4" %}
-                    <li class="mb-2 small d-flex align-items-center gap-2">
-                      {% if feature.is_included %}<i class="bi bi-check-circle-fill text-success flex-shrink-0"></i>
-                      {% else %}<i class="bi bi-x-circle text-muted flex-shrink-0"></i>{% endif %}
-                      <span>{{ feature.text }}</span>
+                <!-- Features List -->
+                <ul role="list" class="mb-8 space-y-4 text-left">
+                    {% for feature in plan.features.all %}
+                    <li class="flex items-center space-x-3">
+                        <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        <span>{{ feature.text }}</span>
                     </li>
-                  {% endfor %}
+                    {% endfor %}
                 </ul>
-                <a href="{% url 'account_signup' %}" class="btn btn-{% if plan.is_featured %}primary{% else %}outline-primary{% endif %} w-100 fw-semibold">Start Free Trial</a>
-              </div>
+                <a href="{% url 'orders:checkout' plan_slug=plan.slug %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900 mt-auto shadow-md hover:shadow-lg transition-shadow">
+                    Get started
+                </a>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-      <div class="text-center mt-4">
-        <a href="{% url 'services:pricing' %}" class="btn btn-outline-secondary px-4">Compare all plans <i class="bi bi-arrow-right ms-1"></i></a>
-      </div>
-    {% else %}
-      <div class="row g-4 justify-content-center">
-        <div class="col-md-4">
-          <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-body p-4 text-center">
-              <h4 class="fw-bold">Starter</h4>
-              <p class="display-5 fw-bold text-primary">$9<span class="fs-5 text-muted">/mo</span></p>
-              <p class="text-muted small mb-4">Great for individuals and small projects.</p>
-              <a href="{% url 'services:pricing' %}" class="btn btn-outline-primary w-100">Get Started</a>
-            </div>
-          </div>
+            {% endfor %}
         </div>
-        <div class="col-md-4">
-          <div class="card border-0 shadow-lg rounded-4 h-100" style="border: 2px solid #1a56db !important;">
-            <div class="card-header text-center bg-primary text-white rounded-top-4 py-2 border-0">
-              <span class="fw-semibold small"><i class="bi bi-star-fill me-1"></i>Most Popular</span>
-            </div>
-            <div class="card-body p-4 text-center">
-              <h4 class="fw-bold">Business</h4>
-              <p class="display-5 fw-bold text-primary">$29<span class="fs-5 text-muted">/mo</span></p>
-              <p class="text-muted small mb-4">Everything your growing business needs.</p>
-              <a href="{% url 'services:pricing' %}" class="btn btn-primary w-100">Get Started</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-body p-4 text-center">
-              <h4 class="fw-bold">Enterprise</h4>
-              <p class="display-5 fw-bold text-primary">$99<span class="fs-5 text-muted">/mo</span></p>
-              <p class="text-muted small mb-4">Custom solutions for large organisations.</p>
-              <a href="{% url 'services:pricing' %}" class="btn btn-outline-primary w-100">Contact Us</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-  </div>
+    </div>
 </section>
 
-<!-- Why us -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold display-6">Why businesses choose Tech-IT</h2>
+<!-- Call to Action -->
+<section class="bg-gray-50 dark:bg-gray-800">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+        <div class="mx-auto max-w-screen-sm text-center">
+            <h2 class="mb-4 text-4xl tracking-tight font-extrabold leading-tight text-gray-900 dark:text-white">Start your free trial today</h2>
+            <p class="mb-6 font-light text-gray-500 dark:text-gray-400 md:text-lg">Try EZ Solutions Platform for 14 days. No credit card required.</p>
+            <a href="{% url 'account_signup' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">Sign Up Free</a>
+        </div>
     </div>
-    <div class="row g-4 text-center">
-      <div class="col-md-3">
-        <div class="p-4">
-          <div class="mb-3 fs-1 text-primary"><i class="bi bi-lightning-fill"></i></div>
-          <h5 class="fw-bold">Blazing Fast</h5>
-          <p class="text-muted small">NVMe SSD storage and global CDN  pages load in milliseconds.</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="p-4">
-          <div class="mb-3 fs-1 text-success"><i class="bi bi-shield-lock-fill"></i></div>
-          <h5 class="fw-bold">Secure by Default</h5>
-          <p class="text-muted small">Free SSL, DDoS protection, and nightly malware scans on all plans.</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="p-4">
-          <div class="mb-3 fs-1 text-warning"><i class="bi bi-headset"></i></div>
-          <h5 class="fw-bold">Expert Support</h5>
-          <p class="text-muted small">Real humans available 24/7. Average response time under 5 minutes.</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="p-4">
-          <div class="mb-3 fs-1 text-info"><i class="bi bi-graph-up-arrow"></i></div>
-          <h5 class="fw-bold">Scales With You</h5>
-          <p class="text-muted small">Upgrade instantly  no downtime, no data migration headaches.</p>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
-
-<!-- Testimonials -->
-<section class="py-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold display-6">What our customers say</h2>
-      <p class="text-muted">Real reviews from real businesses.</p>
-    </div>
-    <div class="row g-4 justify-content-center">
-      <div class="col-md-4">
-        <div class="card testimonial-card border-0 rounded-4 shadow-sm h-100 p-2">
-          <div class="card-body p-4">
-            <div class="text-warning mb-3">
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            </div>
-            <p class="mb-4">"Tech-IT Solutions transformed our IT operations. The uptime and response times are genuinely industry-leading."</p>
-            <div class="d-flex align-items-center gap-3">
-              <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold" style="width:44px;height:44px;flex-shrink:0;">JD</div>
-              <div><div class="fw-bold small">John D.</div><div class="text-muted small">CEO, Acme Corp</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card testimonial-card border-0 rounded-4 shadow-sm h-100 p-2">
-          <div class="card-body p-4">
-            <div class="text-warning mb-3">
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            </div>
-            <p class="mb-4">"The dashboard is incredibly intuitive and the managed IT service gives us real peace of mind. Highly recommend."</p>
-            <div class="d-flex align-items-center gap-3">
-              <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center fw-bold" style="width:44px;height:44px;flex-shrink:0;">SK</div>
-              <div><div class="fw-bold small">Sarah K.</div><div class="text-muted small">CTO, Widget Inc</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card testimonial-card border-0 rounded-4 shadow-sm h-100 p-2">
-          <div class="card-body p-4">
-            <div class="text-warning mb-3">
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            </div>
-            <p class="mb-4">"Migrated to Tech-IT 6 months ago  best decision we made. Support responds faster than any provider we've used."</p>
-            <div class="d-flex align-items-center gap-3">
-              <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:44px;height:44px;flex-shrink:0;background:#f3e8ff;color:#7c3aed;">ML</div>
-              <div><div class="fw-bold small">Mike L.</div><div class="text-muted small">Founder, DevStudio</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="py-5 text-center text-white" style="background: linear-gradient(135deg, #1a56db 0%, #059669 100%);">
-  <div class="container py-3">
-    <h2 class="display-6 fw-bold mb-3">Ready to get started?</h2>
-    <p class="lead mb-4" style="opacity:.9;">
-      Join thousands of businesses already running on Tech-IT Solutions.<br>
-      Start your free 14-day trial today  no credit card required.
-    </p>
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="{% url 'account_signup' %}" class="btn btn-light btn-lg fw-bold px-5 shadow">Create Free Account</a>
-      <a href="{% url 'services:pricing' %}" class="btn btn-outline-light btn-lg px-5">View Pricing</a>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer py-5">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <i class="bi bi-lightning-charge-fill text-primary fs-4"></i>
-          <span class="fw-bold fs-5">Tech-IT Solutions</span>
-        </div>
-        <p class="text-muted small">Modern hosting and managed IT for businesses that want to grow without worrying about infrastructure.</p>
-      </div>
-      <div class="col-md-2 offset-md-2">
-        <h6 class="fw-bold mb-3">Product</h6>
-        <ul class="list-unstyled small">
-          <li class="mb-2"><a href="{% url 'services:pricing' %}" class="text-muted text-decoration-none">Pricing</a></li>
-          <li class="mb-2"><a href="{% url 'account_signup' %}" class="text-muted text-decoration-none">Sign Up</a></li>
-          <li class="mb-2"><a href="{% url 'account_login' %}" class="text-muted text-decoration-none">Login</a></li>
-        </ul>
-      </div>
-      <div class="col-md-2">
-        <h6 class="fw-bold mb-3">Support</h6>
-        <ul class="list-unstyled small">
-          {% if user.is_authenticated %}
-            <li class="mb-2"><a href="{% url 'tickets:list' %}" class="text-muted text-decoration-none">My Tickets</a></li>
-            <li class="mb-2"><a href="{% url 'tickets:create' %}" class="text-muted text-decoration-none">Open Ticket</a></li>
-          {% else %}
-            <li class="mb-2"><a href="{% url 'account_login' %}" class="text-muted text-decoration-none">Support Login</a></li>
-          {% endif %}
-          <li class="mb-2"><a href="{% url 'home:about' %}" class="text-muted text-decoration-none">About Us</a></li>
-        </ul>
-      </div>
-      <div class="col-md-2">
-        <h6 class="fw-bold mb-3">Legal</h6>
-        <ul class="list-unstyled small">
-          <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Privacy Policy</a></li>
-          <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Terms of Service</a></li>
-          <li class="mb-2"><a href="#" class="text-muted text-decoration-none">SLA</a></li>
-        </ul>
-      </div>
-    </div>
-    <hr class="mt-4 border-secondary">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <p class="text-muted small mb-0">&copy; {% now "Y" %} Tech-IT Solutions. All rights reserved.</p>
-      <div class="d-flex gap-3">
-        <a href="#" class="text-muted"><i class="bi bi-twitter-x fs-5"></i></a>
-        <a href="#" class="text-muted"><i class="bi bi-linkedin fs-5"></i></a>
-        <a href="#" class="text-muted"><i class="bi bi-github fs-5"></i></a>
-      </div>
-    </div>
-  </div>
-</footer>
 
 {% endblock %}

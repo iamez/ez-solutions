@@ -4,14 +4,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from decouple import config
 
-from .health import AppHealthCheckView
+from .health import health_check
 
 urlpatterns = [
     # Admin
-    path("admin/", admin.site.urls),
+    path(config("ADMIN_URL", default="admin/"), admin.site.urls),
     # Infrastructure health endpoint
-    path("ht/", AppHealthCheckView.as_view(), name="health-check"),
+    path("ht/", health_check, name="health-check"),
     # Public pages
     path("", include("home.urls", namespace="home")),
     # Allauth (login, logout, register, email verification, password reset)
@@ -26,6 +27,8 @@ urlpatterns = [
     path("", include("orders.urls", namespace="orders")),
     # Support tickets
     path("tickets/", include("tickets.urls", namespace="tickets")),
+    # Notification preferences & unsubscribe
+    path("notifications/", include("notifications.urls", namespace="notifications")),
 ]
 
 # Serve media files in development

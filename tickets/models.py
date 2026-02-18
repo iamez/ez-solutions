@@ -93,6 +93,9 @@ class TicketMessage(models.Model):
         verbose_name = "Ticket Message"
         verbose_name_plural = "Ticket Messages"
         ordering = ["created_at"]
+        indexes = [
+            models.Index(fields=["ticket", "created_at"], name="ticketmsg_ticket_created_idx"),
+        ]
 
     def __str__(self) -> str:
         sender_name = self.sender.email if self.sender else "deleted user"

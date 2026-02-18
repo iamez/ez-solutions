@@ -98,7 +98,7 @@ class TicketCreateSerializer(serializers.Serializer):
     """Payload for opening a new support ticket."""
 
     subject = serializers.CharField(max_length=200)
-    body = serializers.CharField()
+    body = serializers.CharField(max_length=10000)
     priority = serializers.ChoiceField(
         choices=["low", "normal", "high", "urgent"],
         default="normal",
@@ -108,7 +108,7 @@ class TicketCreateSerializer(serializers.Serializer):
 class TicketReplySerializer(serializers.Serializer):
     """Payload for adding a reply to an existing ticket."""
 
-    body = serializers.CharField()
+    body = serializers.CharField(max_length=10000)
 
 
 # ---------------------------------------------------------------------------
@@ -155,7 +155,7 @@ class MeSerializer(serializers.ModelSerializer):
         customer = getattr(user, "stripe_customer", None)
         if customer is None:
             return None
-        sub = customer.subscriptions.filter(status__in=["active", "trialing"]).first()
+        sub = customer.get_active_subscription()
         if sub is None:
             return None
         return SubscriptionSerializer(sub).data

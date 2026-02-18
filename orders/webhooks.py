@@ -45,8 +45,10 @@ def _handle_checkout_completed(session: dict) -> None:
     _upsert_subscription(customer, stripe_sub)
 
     plan_slug = session.get("metadata", {}).get("plan_slug", "")
-    _update_user_tier(customer.user, plan_slug)
-    _queue_checkout_success_email(customer.user.pk, _resolve_plan_name(plan_slug))
+    plan = _get_plan(plan_slug)
+    _update_user_tier(customer.user, plan)
+    plan_name = plan.name if plan else plan_slug.replace("-", " ").title() or "Your selected plan"
+    _queue_checkout_success_email(customer.user.pk, plan_name)
 
 
 def _handle_subscription_change(subscription: dict) -> None:
@@ -95,12 +97,18 @@ def _upsert_subscription(customer: Customer, stripe_sub: dict) -> Subscription:
     return sub
 
 
-def _update_user_tier(user, plan_slug: str) -> None:
+def _get_plan(plan_slug: str):
+    """Fetch ServicePlan by slug, returning None if not found."""
+    if not plan_slug:
+        return None
     try:
-        plan = ServicePlan.objects.get(slug=plan_slug)
-        tier_key = plan.tier_key
+        return ServicePlan.objects.get(slug=plan_slug)
     except ServicePlan.DoesNotExist:
-        tier_key = ""
+        return None
+
+
+def _update_user_tier(user, plan) -> None:
+    tier_key = plan.tier_key if plan else ""
 
     mapping = {
         "starter": SubscriptionTier.STARTER,
@@ -111,16 +119,6 @@ def _update_user_tier(user, plan_slug: str) -> None:
     if new_tier:
         user.subscription_tier = new_tier
         user.save(update_fields=["subscription_tier"])
-
-
-def _resolve_plan_name(plan_slug: str) -> str:
-    if not plan_slug:
-        return "Your selected plan"
-    try:
-        plan = ServicePlan.objects.get(slug=plan_slug)
-        return plan.name
-    except ServicePlan.DoesNotExist:
-        return plan_slug.replace("-", " ").title()
 
 
 def _queue_checkout_success_email(user_id: int, plan_name: str) -> None:

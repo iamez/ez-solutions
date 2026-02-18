@@ -1,95 +1,74 @@
-{% extends 'base.html' %}
-
-{% block title %}Pricing — Tech-IT Solutions{% endblock %}
+{% extends "base.html" %}
+{% block title %}Pricing — EZ Solutions{% endblock %}
 
 {% block content %}
 <!-- Hero -->
-<section class="py-5 text-center" style="background: linear-gradient(135deg, #1a56db 0%, #0e4bbd 100%); color: white;">
-  <div class="container">
-    <span class="badge bg-white text-primary fw-semibold mb-3 px-3 py-2">Simple, transparent pricing</span>
-    <h1 class="display-5 fw-bold mb-3">Choose the plan that fits your business</h1>
-    <p class="lead mb-0" style="opacity: .9;">All plans include a 14-day free trial — no credit card required.</p>
-  </div>
+<section class="bg-primary-700 dark:bg-primary-800 py-12 px-4">
+    <div class="max-w-screen-xl mx-auto text-center">
+        <span class="bg-white text-primary-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4 inline-block">Simple, transparent pricing</span>
+        <h1 class="text-4xl font-extrabold text-white mb-3">Choose the plan that fits your business</h1>
+        <p class="text-primary-200 text-lg">All plans include a 14-day free trial — no credit card required.</p>
+    </div>
 </section>
 
 <!-- Plans -->
-<section class="py-5">
-  <div class="container">
-    {% if plans %}
-      <div class="row g-4 justify-content-center">
-        {% for plan in plans %}
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4{% if plan.is_featured %} border-primary border-2{% endif %}" style="{% if plan.is_featured %}border: 2px solid #1a56db !important;{% endif %}">
-              {% if plan.is_featured %}
-                <div class="card-header text-center bg-primary text-white rounded-top-4 py-2 border-0">
-                  <span class="fw-semibold small"><i class="bi bi-star-fill me-1"></i>Most Popular</span>
+<section class="bg-gray-50 dark:bg-gray-900 py-16 px-4">
+    <div class="max-w-screen-xl mx-auto">
+        {% if plans %}
+        <div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
+            {% for plan in plans %}
+            <div class="flex flex-col p-6 mx-auto max-w-lg text-center bg-white rounded-lg border {% if plan.is_featured %}border-primary-600 border-2 ring-2 ring-primary-100 dark:ring-primary-900{% else %}border-gray-100{% endif %} shadow dark:border-gray-600 dark:bg-gray-800 w-full">
+                {% if plan.is_featured %}
+                <div class="-mt-6 mb-4">
+                    <span class="bg-primary-600 text-white text-xs font-semibold px-3 py-1 rounded-full">Most Popular</span>
                 </div>
-              {% endif %}
-              <div class="card-body p-4 d-flex flex-column">
-                <!-- Plan name & tagline -->
-                <h3 class="fw-bold mb-1">{{ plan.name }}</h3>
-                {% if plan.tagline %}
-                  <p class="text-muted small mb-3">{{ plan.tagline }}</p>
                 {% endif %}
-
-                <!-- Price -->
-                <div class="mb-4">
-                  <span class="display-6 fw-bold">${{ plan.price_monthly }}</span>
-                  <span class="text-muted">/mo</span>
-                  {% if plan.annual_savings %}
-                    <div class="mt-1">
-                      <span class="badge bg-success-subtle text-success">{{ plan.annual_savings }}</span>
-                    </div>
-                  {% endif %}
+                <h3 class="mb-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ plan.name }}</h3>
+                {% if plan.tagline %}<p class="text-gray-500 dark:text-gray-400 text-sm mb-4">{{ plan.tagline }}</p>{% endif %}
+                <div class="flex justify-center items-baseline my-8">
+                    <span class="mr-2 text-5xl font-extrabold text-gray-900 dark:text-white">${{ plan.price_monthly }}</span>
+                    <span class="text-gray-500 dark:text-gray-400">/mo</span>
                 </div>
-
-                <!-- Features -->
-                <ul class="list-unstyled mb-4 flex-grow-1">
-                  {% for feature in plan.features.all %}
-                    <li class="mb-2 d-flex align-items-center gap-2">
-                      {% if feature.is_included %}
-                        <i class="bi bi-check-circle-fill text-success"></i>
-                      {% else %}
-                        <i class="bi bi-x-circle text-muted"></i>
-                      {% endif %}
-                      <span class="{% if not feature.is_included %}text-muted{% endif %}">{{ feature.text }}</span>
+                {% if plan.annual_savings %}
+                <div class="-mt-4 mb-6">
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Save {{ plan.annual_savings }}</span>
+                </div>
+                {% endif %}
+                <ul role="list" class="mb-8 space-y-4 text-left flex-grow">
+                    {% for feature in plan.features.all %}
+                    <li class="flex items-center space-x-3">
+                        {% if feature.is_included %}
+                        <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        <span class="text-gray-700 dark:text-gray-300">{{ feature.text }}</span>
+                        {% else %}
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                        <span class="text-gray-400 dark:text-gray-500 line-through">{{ feature.text }}</span>
+                        {% endif %}
                     </li>
-                  {% endfor %}
+                    {% endfor %}
                 </ul>
-
-                <!-- CTA -->
                 {% if user.is_authenticated %}
-                  <a href="{% url 'orders:checkout' plan.slug %}"
-                     class="btn btn-{% if plan.is_featured %}primary{% else %}outline-primary{% endif %} w-100 fw-semibold">
+                <a href="{% url 'orders:checkout' plan.slug %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 mt-auto">
                     Get Started
-                  </a>
+                </a>
                 {% else %}
-                  <a href="{% url 'account_signup' %}" class="btn btn-{% if plan.is_featured %}primary{% else %}outline-primary{% endif %} w-100 fw-semibold">
+                <a href="{% url 'account_signup' %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 mt-auto">
                     Start Free Trial
-                  </a>
+                </a>
                 {% endif %}
-              </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- FAQ teaser -->
-      <div class="text-center mt-5">
-        <p class="text-muted">
-          Questions? <a href="{% url 'home:index' %}" class="text-primary fw-semibold">Contact us</a>
-          — we're happy to help you find the right plan.
-        </p>
-      </div>
-
-    {% else %}
-      <!-- No plans in DB yet -->
-      <div class="text-center py-5">
-        <i class="bi bi-grid-3x3-gap fs-1 text-muted mb-3 d-block"></i>
-        <h3 class="fw-bold text-muted">Plans coming soon</h3>
-        <p class="text-muted">We're finalising our pricing. <a href="{% url 'home:index' %}">Get in touch</a> for early access.</p>
-      </div>
-    {% endif %}
-  </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-10">
+            <p class="text-gray-500 dark:text-gray-400">Questions? <a href="{% url 'tickets:create' %}" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Contact us</a> — we're happy to help.</p>
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+            <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <h3 class="text-xl font-bold text-gray-500 dark:text-gray-400 mb-2">Plans coming soon</h3>
+            <p class="text-gray-400 dark:text-gray-500">We're finalizing our pricing. <a href="{% url 'home:about' %}" class="text-primary-600 hover:underline">Get in touch</a> for early access.</p>
+        </div>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Updated</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f9fafb; font-family:Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" style="background-color:#f9fafb; padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#1e40af; padding:24px 32px;">
+              <h1 style="margin:0; color:#ffffff; font-size:22px; font-weight:700;">⚡ EZ Solutions</h1>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px;">
+              <h2 style="margin:0 0 16px; color:#111827; font-size:20px;">Subscription updated</h2>
+              <p style="color:#4b5563; font-size:16px; line-height:1.6; margin:0 0 16px;">
+                Hi {{ name }},
+              </p>
+              <p style="color:#4b5563; font-size:16px; line-height:1.6; margin:0 0 24px;">
+                Your EZ Solutions subscription has been moved to the <strong>Free</strong> tier. You'll still have access to free-tier features.
+              </p>
+              <p style="color:#4b5563; font-size:16px; line-height:1.6; margin:0 0 24px;">
+                If this was unexpected, please reach out — we're happy to help resolve any issues.
+              </p>
+              <table role="presentation" style="margin:0 0 24px;">
+                <tr>
+                  <td style="background-color:#1e40af; border-radius:6px; padding:12px 28px;">
+                    <a href="{{ support_url }}" style="color:#ffffff; text-decoration:none; font-size:16px; font-weight:600;">Contact Support</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="color:#6b7280; font-size:14px; line-height:1.5; margin:0;">
+                Want to resubscribe? Visit the
+                <a href="{{ pricing_url }}" style="color:#1e40af; text-decoration:underline;">pricing page</a>.
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f3f4f6; padding:20px 32px; text-align:center;">
+              <p style="color:#9ca3af; font-size:13px; margin:0;">
+                &copy; {{ year }} EZ Solutions. All rights reserved.
+                <br><a href="{{ unsubscribe_url }}" style="color:#9ca3af; text-decoration:underline;">Unsubscribe</a> or <a href="{{ preferences_url }}" style="color:#9ca3af; text-decoration:underline;">manage preferences</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

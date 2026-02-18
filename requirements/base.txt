@@ -35,3 +35,10 @@ gunicorn==23.0.0
 # Monitoring
 sentry-sdk[django]==2.53.0
 django-health-check==4.0.3
+
+# Security
+django-axes==6.5.2
+django-csp==4.0
+
+# Notifications (Telegram/Signal HTTP client)
+httpx==0.28.1

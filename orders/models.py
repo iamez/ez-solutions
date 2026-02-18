@@ -23,6 +23,16 @@ class Customer(models.Model):
     def __str__(self) -> str:
         return f"{self.user.email} → {self.stripe_customer_id}"
 
+    def get_active_subscription(self):
+        """Return the first active/trialing/past_due subscription, or None."""
+        return self.subscriptions.filter(
+            status__in=[
+                SubscriptionStatus.ACTIVE,
+                SubscriptionStatus.TRIALING,
+                SubscriptionStatus.PAST_DUE,
+            ]
+        ).first()
+
 
 class SubscriptionStatus(models.TextChoices):
     ACTIVE = "active", "Active"
@@ -81,21 +91,37 @@ class Subscription(models.Model):
         return None
 
 
+class EventStatus(models.TextChoices):
+    RECEIVED = "received", "Received"
+    PROCESSING = "processing", "Processing"
+    PROCESSED = "processed", "Processed"
+    FAILED = "failed", "Failed"
+    SKIPPED = "skipped", "Skipped"
+
+
 class PaymentEvent(models.Model):
     """Idempotency log — records every processed Stripe webhook event ID."""
 
     stripe_event_id = models.CharField(max_length=100, unique=True)
-    event_type = models.CharField(max_length=100)
-    processed_at = models.DateTimeField(auto_now_add=True)
+    event_type = models.CharField(max_length=100, db_index=True)
+    status = models.CharField(
+        max_length=20,
+        choices=EventStatus.choices,
+        default=EventStatus.RECEIVED,
+        db_index=True,
+    )
+    error_message = models.TextField(blank=True, default="")
+    received_at = models.DateTimeField(default=timezone.now)
+    processed_at = models.DateTimeField(null=True, blank=True)
     payload = models.JSONField(default=dict, help_text="Full event payload for audit trail")
 
     class Meta:
         verbose_name = "Payment Event"
         verbose_name_plural = "Payment Events"
-        ordering = ["-processed_at"]
+        ordering = ["-received_at"]
 
     def __str__(self) -> str:
-        return f"{self.event_type} — {self.stripe_event_id}"
+        return f"{self.event_type} — {self.stripe_event_id} [{self.status}]"
 
 
 class OrderStatus(models.TextChoices):

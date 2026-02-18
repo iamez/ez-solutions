@@ -1,92 +1,175 @@
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>{% block title %}Tech-IT Solutions{% endblock %}</title>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="{% static 'css/style.css' %}">
-	{% block extra_head %}{% endblock %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EZ Solutions{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (Local Build) -->
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <!-- Flowbite -->
+    <script>
+        // Check for dark mode preference
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+
+    <!-- Flowbite -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" integrity="sha512-mMwynEBiXwV3KQGXOOA4ek2v2MhYBZCB0ZI0yrR0YkyGEYmSNotPZVDMD78cpSJH+OEYA8Pm46GGerphkEPgg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Custom scrollbar for modern feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
 </head>
-<body style="font-family: 'Inter', sans-serif; background: #f8fafc;">
-	<!-- Navbar -->
-	<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-		<div class="container">
-			<a class="navbar-brand d-flex align-items-center" href="{% url 'home:index' %}">
-				<i class="bi bi-lightning-charge-fill text-primary fs-2 me-2"></i>
-				<span class="fw-bold">Tech-IT Solutions</span>
-			</a>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarNav">
-				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-					<li class="nav-item"><a class="nav-link" href="{% url 'home:index' %}">Home</a></li>
-					<li class="nav-item"><a class="nav-link" href="{% url 'services:pricing' %}">Pricing</a></li>
-					{% if user.is_authenticated %}
-						<li class="nav-item"><a class="nav-link" href="{% url 'users:dashboard' %}">Dashboard</a></li>
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-								<i class="bi bi-person-circle me-1"></i>{{ user.full_name }}
-							</a>
-							<ul class="dropdown-menu dropdown-menu-end shadow-sm">
-								<li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="bi bi-person me-2"></i>My Profile</a></li>
-								<li><a class="dropdown-item" href="{% url 'orders:billing' %}"><i class="bi bi-credit-card me-2"></i>Billing</a></li>
-								<li><a class="dropdown-item" href="{% url 'tickets:list' %}"><i class="bi bi-headset me-2"></i>Support Tickets</a></li>
-								<li><hr class="dropdown-divider"></li>
-								<li>
-									<form method="post" action="{% url 'account_logout' %}" class="d-inline">
-										{% csrf_token %}
-										<button type="submit" class="dropdown-item text-danger">
-											<i class="bi bi-box-arrow-right me-2"></i>Sign Out
-										</button>
-									</form>
-								</li>
-							</ul>
-						</li>
-					{% else %}
-						<li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
-						<li class="nav-item">
-							<a class="btn btn-primary btn-sm ms-2 px-3" href="{% url 'account_signup' %}">Get Started</a>
-						</li>
-					{% endif %}
-				</ul>
-			</div>
-		</div>
-	</nav>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white font-sans antialiased flex flex-col min-h-screen">
 
-	<!-- Main Content -->
-	<main class="main-content">
-		{% block content %}{% endblock %}
-	</main>
+    <!-- Navigation -->
+    <nav class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 border-b shadow-sm">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="{% url 'home:index' %}" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="bg-primary-600 text-white p-1.5 rounded-lg">
+                    <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <span class="self-center text-xl font-bold whitespace-nowrap dark:text-white tracking-tight">EZ Solutions</span>
+            </a>
+            
+            <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+                {% if user.is_authenticated %}
+                    <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
+                        <span class="sr-only">Open user menu</span>
+                        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
+                            {{ user.email|slice:":2"|upper }}
+                        </div>
+                    </button>
+                    <!-- Dropdown menu -->
+                    <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
+                        <div class="px-4 py-3">
+                            <span class="block text-sm text-gray-900 dark:text-white">{{ user.email }}</span>
+                            <span class="block text-sm text-gray-500 truncate dark:text-gray-400 font-medium badge bg-green-100 text-green-800 px-2 py-0.5 rounded dark:bg-green-900 dark:text-green-300 text-xs mt-1 w-fit">
+                                {{ user.subscription_tier|default:"Free Tier"|title }}
+                            </span>
+                        </div>
+                        <ul class="py-2" aria-labelledby="user-menu-button">
+                            <li>
+                                <a href="{% url 'users:dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profile Settings</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'orders:billing' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Billing & Invoices</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'tickets:list' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Support Tickets</a>
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'account_logout' %}" class="block w-full">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-400 dark:hover:text-white">Sign out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'account_login' %}" class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">Log in</a>
+                    <a href="{% url 'account_signup' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">Get started</a>
+                {% endif %}
+                <button data-collapse-toggle="navbar-user" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-user" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
+                <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li>
+                        <a href="{% url 'home:index' %}" class="block py-2 px-3 text-white bg-primary-700 rounded md:bg-transparent md:text-primary-700 md:p-0 md:dark:text-primary-500" aria-current="page">Home</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'services:pricing' %}" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary-700 md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Pricing</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'home:about' %}" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-primary-700 md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-	<!-- Footer -->
-	<footer class="footer bg-dark text-light py-4 mt-5">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-6 mb-3 mb-md-0">
-					<h5 class="fw-bold">Tech-IT Solutions</h5>
-					<p class="mb-0">Modern hosting & tech solutions for your business. 99.9% uptime. 24/7 support.</p>
-				</div>
-				<div class="col-md-6 text-md-end">
-					<a href="#" class="text-light me-3"><i class="bi bi-facebook"></i></a>
-					<a href="#" class="text-light me-3"><i class="bi bi-twitter"></i></a>
-					<a href="#" class="text-light me-3"><i class="bi bi-linkedin"></i></a>
-					<a href="#" class="text-light"><i class="bi bi-github"></i></a>
-				</div>
-			</div>
-			<div class="row mt-3">
-				<div class="col-12 text-center">
-					<small>&copy; {{ year|default:2025 }} Tech-IT Solutions. All rights reserved.</small>
-				</div>
-			</div>
-		</div>
-	</footer>
+    <!-- Content -->
+    <main class="flex-grow">
+        {% if messages %}
+            <div class="max-w-screen-xl mx-auto mt-4 px-4">
+                {% for message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'success' %}text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400{% elif message.tags == 'error' %}text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400{% else %}text-blue-800 bg-blue-50 dark:bg-gray-800 dark:text-blue-400{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-	{% block extra_js %}{% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white rounded-lg shadow dark:bg-gray-900 m-4 mt-auto">
+        <div class="w-full max-w-screen-xl mx-auto p-4 md:py-8">
+            <div class="sm:flex sm:items-center sm:justify-between">
+                <a href="{% url 'home:index' %}" class="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
+                    <div class="bg-primary-600 text-white p-1 rounded">
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">EZ Solutions</span>
+                </a>
+                <ul class="flex flex-wrap items-center mb-6 text-sm font-medium text-gray-500 sm:mb-0 dark:text-gray-400">
+                    <li>
+                        <a href="{% url 'home:about' %}" class="hover:underline me-4 md:me-6">About</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'services:pricing' %}" class="hover:underline me-4 md:me-6">Pricing</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'tickets:create' %}" class="hover:underline">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
+            <span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400">© {% now "Y" %} <a href="{% url 'home:index' %}" class="hover:underline">EZ Solutions</a>. All Rights Reserved.</span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js" integrity="sha512-VVMKMmRVQGF1I/6dFgDnbIRF1v8b9RQWM5/KIlm28rRfJhjq04hy8FPuqjzGkLJnERsBIjaLqYzQoYbD/vgg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
