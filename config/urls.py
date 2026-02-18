@@ -4,8 +4,16 @@ from decouple import config
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 from health_check.views import HealthCheckView
+
+from home.sitemaps import PricingSitemap, StaticSitemap
+
+sitemaps = {
+    "static": StaticSitemap,
+    "pricing": PricingSitemap,
+}
 
 urlpatterns = [
     # Admin
@@ -20,6 +28,8 @@ urlpatterns = [
         ),
         name="health-check",
     ),
+    # Sitemap
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     # Public pages
     path("", include("home.urls", namespace="home")),
     # Allauth (login, logout, register, email verification, password reset)

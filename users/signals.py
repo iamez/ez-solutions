@@ -24,3 +24,26 @@ def on_user_signed_up(sender, request, user, **kwargs):
         log.exception("Failed to enqueue welcome email for user %s", user.pk)
         # Fallback: run synchronously
         send_welcome_email_task.run(user.pk)
+
+    # Notify admins about new signup via all configured channels
+    _notify_admin_new_signup(user)
+
+
+def _notify_admin_new_signup(user) -> None:
+    from notifications.tasks import send_admin_notification_task
+
+    try:
+        send_admin_notification_task.apply_async(
+            args=[
+                "New user signup",
+                f"New user registered: {user.email} (ID: {user.pk}).",
+            ],
+            kwargs={
+                "html_body": (
+                    f"<p>New user registered: <strong>{user.email}</strong> (ID: {user.pk}).</p>"
+                ),
+            },
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception("Failed to enqueue admin signup notification for user %s", user.pk)

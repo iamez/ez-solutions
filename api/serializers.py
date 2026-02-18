@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from orders.models import Subscription
+from orders.models import Order, Subscription, VPSInstance
 from services.models import PlanFeature, ServicePlan
 from tickets.models import Ticket, TicketMessage
 
@@ -120,6 +120,42 @@ class TicketReplySerializer(serializers.Serializer):
     """Payload for adding a reply to an existing ticket."""
 
     body = serializers.CharField(max_length=10000)
+
+
+# ---------------------------------------------------------------------------
+# Orders
+# ---------------------------------------------------------------------------
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    service_plan_name = serializers.CharField(source="service_plan.name", read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ["id", "service_plan_name", "status", "amount_total", "currency", "created_at"]
+        read_only_fields = fields
+
+
+# ---------------------------------------------------------------------------
+# VPS
+# ---------------------------------------------------------------------------
+
+
+class VPSInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VPSInstance
+        fields = [
+            "id",
+            "hostname",
+            "ip_address",
+            "os_template",
+            "cpu_cores",
+            "ram_mb",
+            "disk_gb",
+            "status",
+            "created_at",
+        ]
+        read_only_fields = fields
 
 
 # ---------------------------------------------------------------------------

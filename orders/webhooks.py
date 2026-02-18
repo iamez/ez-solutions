@@ -130,6 +130,48 @@ def _queue_checkout_success_email(user_id: int, plan_name: str) -> None:
         log.exception("Email enqueue failed for user %s; sending synchronously", user_id)
         send_checkout_success_email_task.run(user_id, plan_name)
 
+    # Multi-channel dispatch (email + telegram + signal)
+    _queue_checkout_notifications(user_id, plan_name)
+
+
+def _queue_checkout_notifications(user_id: int, plan_name: str) -> None:
+    from notifications.tasks import (
+        send_admin_notification_task,
+        send_notification_task,
+    )
+
+    user_body = f"Your {plan_name} plan is now active. Thank you for subscribing!"
+    user_html = (
+        f"<p>Your <strong>{plan_name}</strong> plan is now active. Thank you for subscribing!</p>"
+    )
+    try:
+        send_notification_task.apply_async(
+            args=[user_id, "Subscription activated", user_body],
+            kwargs={"html_body": user_html},
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Multi-channel user notification failed for checkout user %s",
+            user_id,
+        )
+
+    admin_body = f"User {user_id} subscribed to {plan_name}."
+    admin_html = (
+        f"<p>User <strong>{user_id}</strong> subscribed to <strong>{plan_name}</strong>.</p>"
+    )
+    try:
+        send_admin_notification_task.apply_async(
+            args=["New subscription", admin_body],
+            kwargs={"html_body": admin_html},
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Multi-channel admin notification failed for checkout user %s",
+            user_id,
+        )
+
 
 def _queue_subscription_canceled_email(user_id: int) -> None:
     from .tasks import send_subscription_canceled_email_task
@@ -139,3 +181,41 @@ def _queue_subscription_canceled_email(user_id: int) -> None:
     except Exception:  # noqa: BLE001
         log.exception("Cancel email enqueue failed for user %s; sending synchronously", user_id)
         send_subscription_canceled_email_task.run(user_id)
+
+    # Multi-channel dispatch (email + telegram + signal)
+    _queue_cancellation_notifications(user_id)
+
+
+def _queue_cancellation_notifications(user_id: int) -> None:
+    from notifications.tasks import (
+        send_admin_notification_task,
+        send_notification_task,
+    )
+
+    user_body = "Your subscription has been canceled. You can resubscribe at any time."
+    user_html = "<p>Your subscription has been canceled. You can resubscribe at any time.</p>"
+    try:
+        send_notification_task.apply_async(
+            args=[user_id, "Subscription canceled", user_body],
+            kwargs={"html_body": user_html},
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Multi-channel user notification failed for cancellation user %s",
+            user_id,
+        )
+
+    admin_body = f"User {user_id} has canceled their subscription."
+    admin_html = f"<p>User <strong>{user_id}</strong> has canceled their subscription.</p>"
+    try:
+        send_admin_notification_task.apply_async(
+            args=["Subscription canceled", admin_body],
+            kwargs={"html_body": admin_html},
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Multi-channel admin notification failed for cancellation user %s",
+            user_id,
+        )

@@ -8,16 +8,19 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
+from orders.models import Order, VPSInstance
 from services.models import ServicePlan
 from tickets.models import Ticket, TicketMessage, TicketPriority, TicketStatus
 
 from .serializers import (
     MeSerializer,
+    OrderSerializer,
     ServicePlanSerializer,
     TicketCreateSerializer,
     TicketMessageSerializer,
     TicketReplySerializer,
     TicketSerializer,
+    VPSInstanceSerializer,
 )
 
 
@@ -254,3 +257,33 @@ class MeView(APIView):
             setattr(request.user, field, value)
         request.user.save(update_fields=list(allowed.keys()))
         return Response(MeSerializer(request.user).data)
+
+
+# ---------------------------------------------------------------------------
+# Orders (authenticated)
+# ---------------------------------------------------------------------------
+
+
+class OrderListView(generics.ListAPIView):
+    """GET /api/v1/orders/ — list logged-in user's orders."""
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.filter(customer__user=self.request.user).select_related("service_plan")
+
+
+# ---------------------------------------------------------------------------
+# VPS Instances (authenticated)
+# ---------------------------------------------------------------------------
+
+
+class VPSInstanceListView(generics.ListAPIView):
+    """GET /api/v1/vps/ — list logged-in user's VPS instances."""
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = VPSInstanceSerializer
+
+    def get_queryset(self):
+        return VPSInstance.objects.filter(customer__user=self.request.user)

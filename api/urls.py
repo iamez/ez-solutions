@@ -8,10 +8,12 @@ from .views import (
     HealthView,
     JWTAuthThrottle,
     MeView,
+    OrderListView,
     PlanListView,
     TicketDetailView,
     TicketListCreateView,
     TicketReplyView,
+    VPSInstanceListView,
 )
 
 app_name = "api"
@@ -39,4 +41,6 @@ urlpatterns = [
     path("v1/tickets/", TicketListCreateView.as_view(), name="ticket-list"),
     path("v1/tickets/<int:pk>/", TicketDetailView.as_view(), name="ticket-detail"),
     path("v1/tickets/<int:pk>/reply/", TicketReplyView.as_view(), name="ticket-reply"),
+    path("v1/orders/", OrderListView.as_view(), name="v1-orders-list"),
+    path("v1/vps/", VPSInstanceListView.as_view(), name="v1-vps-list"),
 ]
