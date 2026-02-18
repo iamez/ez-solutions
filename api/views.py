@@ -20,6 +20,7 @@ from .serializers import (
     TicketMessageSerializer,
     TicketReplySerializer,
     TicketSerializer,
+    VPSActionSerializer,
     VPSInstanceSerializer,
 )
 
@@ -287,3 +288,83 @@ class VPSInstanceListView(generics.ListAPIView):
 
     def get_queryset(self):
         return VPSInstance.objects.filter(customer__user=self.request.user)
+
+
+class VPSInstanceDetailView(APIView):
+    """GET /api/v1/vps/{pk}/ — single VPS instance detail (owner only)."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        operation_id="v1_vps_detail",
+        responses={200: VPSInstanceSerializer, 404: OpenApiResponse(description="Not found")},
+    )
+    def get(self, request, pk):
+        try:
+            instance = VPSInstance.objects.get(pk=pk, customer__user=request.user)
+        except VPSInstance.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(VPSInstanceSerializer(instance).data)
+
+
+class VPSInstanceActionView(APIView):
+    """POST /api/v1/vps/{pk}/action/ — execute power action on a VPS instance."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        operation_id="v1_vps_action",
+        request=VPSActionSerializer,
+        responses={
+            200: VPSInstanceSerializer,
+            400: OpenApiResponse(description="Invalid action for current state"),
+            404: OpenApiResponse(description="Not found"),
+        },
+    )
+    def post(self, request, pk):
+        try:
+            instance = VPSInstance.objects.get(pk=pk, customer__user=request.user)
+        except VPSInstance.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = VPSActionSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        action = serializer.validated_data["action"]
+
+        # Validate action is appropriate for current status
+        from orders.models import VPSInstanceStatus
+
+        status_action_map = {
+            "start": {VPSInstanceStatus.STOPPED},
+            "stop": {VPSInstanceStatus.RUNNING},
+            "restart": {VPSInstanceStatus.RUNNING},
+        }
+        if instance.status not in status_action_map[action]:
+            return Response(
+                {"detail": f"Cannot {action} a {instance.get_status_display().lower()} instance."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        from orders.provisioning import get_provider
+
+        provider = get_provider()
+        action_method = getattr(provider, action)
+        success = action_method(instance)
+
+        if not success:
+            return Response(
+                {"detail": f"VPS {action} failed."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        status_result = {
+            "start": VPSInstanceStatus.RUNNING,
+            "stop": VPSInstanceStatus.STOPPED,
+            "restart": VPSInstanceStatus.RUNNING,
+        }
+        instance.status = status_result[action]
+        instance.save(update_fields=["status", "updated_at"])
+
+        return Response(VPSInstanceSerializer(instance).data)

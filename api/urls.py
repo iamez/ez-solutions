@@ -13,6 +13,8 @@ from .views import (
     TicketDetailView,
     TicketListCreateView,
     TicketReplyView,
+    VPSInstanceActionView,
+    VPSInstanceDetailView,
     VPSInstanceListView,
 )
 
@@ -43,4 +45,6 @@ urlpatterns = [
     path("v1/tickets/<int:pk>/reply/", TicketReplyView.as_view(), name="ticket-reply"),
     path("v1/orders/", OrderListView.as_view(), name="v1-orders-list"),
     path("v1/vps/", VPSInstanceListView.as_view(), name="v1-vps-list"),
+    path("v1/vps/<int:pk>/", VPSInstanceDetailView.as_view(), name="v1-vps-detail"),
+    path("v1/vps/<int:pk>/action/", VPSInstanceActionView.as_view(), name="v1-vps-action"),
 ]

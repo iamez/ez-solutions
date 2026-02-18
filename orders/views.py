@@ -14,7 +14,15 @@ from django.views.decorators.http import require_POST
 
 from services.models import ServicePlan
 
-from .models import Customer, Order, PaymentEvent, SubscriptionStatus
+from .models import (
+    Customer,
+    Order,
+    PaymentEvent,
+    SubscriptionStatus,
+    VPSInstance,
+    VPSInstanceStatus,
+)
+from .provisioning import get_provider
 from .tasks import process_stripe_event
 from .webhooks import HANDLED_EVENTS, handle_event
 
@@ -172,6 +180,100 @@ def stripe_webhook(request):
             handle_event(payment_event.payload)
 
     return HttpResponse("ok", status=200)
+
+
+# ---------------------------------------------------------------------------
+# VPS management
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def vps_list(request):
+    """List the authenticated user's VPS instances with optional status filter."""
+    instances = VPSInstance.objects.none()
+    try:
+        customer = request.user.stripe_customer
+        instances = customer.vps_instances.select_related("provisioning_job").order_by(
+            "-created_at"
+        )
+    except Customer.DoesNotExist:
+        pass
+
+    status_filter = request.GET.get("status", "")
+    if status_filter and status_filter in VPSInstanceStatus.values:
+        instances = instances.filter(status=status_filter)
+
+    paginator = Paginator(instances, 10)
+    page = paginator.get_page(request.GET.get("page"))
+
+    return render(
+        request,
+        "orders/vps_list.html",
+        {
+            "instances": page,
+            "status_filter": status_filter,
+            "status_choices": VPSInstanceStatus.choices,
+        },
+    )
+
+
+@login_required
+def vps_detail(request, pk):
+    """Show full VPS instance details with action buttons."""
+    instance = get_object_or_404(
+        VPSInstance.objects.select_related("provisioning_job", "customer"),
+        pk=pk,
+        customer__user=request.user,
+    )
+    return render(request, "orders/vps_detail.html", {"instance": instance})
+
+
+@login_required
+@require_POST
+def vps_action(request, pk):
+    """Execute a power action (start/stop/restart) on a VPS instance."""
+    instance = get_object_or_404(
+        VPSInstance.objects.select_related("customer"),
+        pk=pk,
+        customer__user=request.user,
+    )
+
+    action = request.POST.get("action", "")
+    allowed_actions = {"start", "stop", "restart"}
+    if action not in allowed_actions:
+        messages.error(request, f"Invalid action: {action}")
+        return redirect("orders:vps_detail", pk=instance.pk)
+
+    # Validate action is appropriate for current status
+    status_action_map = {
+        "start": {VPSInstanceStatus.STOPPED},
+        "stop": {VPSInstanceStatus.RUNNING},
+        "restart": {VPSInstanceStatus.RUNNING},
+    }
+    if instance.status not in status_action_map[action]:
+        messages.error(
+            request,
+            f"Cannot {action} a {instance.get_status_display().lower()} instance.",
+        )
+        return redirect("orders:vps_detail", pk=instance.pk)
+
+    provider = get_provider()
+    action_method = getattr(provider, action)
+    success = action_method(instance)
+
+    if success:
+        status_result = {
+            "start": VPSInstanceStatus.RUNNING,
+            "stop": VPSInstanceStatus.STOPPED,
+            "restart": VPSInstanceStatus.RUNNING,
+        }
+        instance.status = status_result[action]
+        instance.save(update_fields=["status", "updated_at"])
+        messages.success(request, f"VPS {instance.hostname} {action} succeeded.")
+    else:
+        messages.error(request, f"VPS {action} failed. Please try again or contact support.")
+
+    return redirect("orders:vps_detail", pk=instance.pk)
 
 
 # ---------------------------------------------------------------------------

@@ -158,6 +158,12 @@ class VPSInstanceSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class VPSActionSerializer(serializers.Serializer):
+    """Payload for VPS power actions."""
+
+    action = serializers.ChoiceField(choices=["start", "stop", "restart"])
+
+
 # ---------------------------------------------------------------------------
 # User / Me
 # ---------------------------------------------------------------------------
