@@ -31,7 +31,7 @@ def on_ticket_message_created(sender, instance, created, **kwargs):
         # Notify admin/staff about customer reply
         from django.conf import settings
 
-        recipient_email = settings.DEFAULT_FROM_EMAIL
+        recipient_email = settings.SUPPORT_EMAIL
 
     try:
         send_ticket_notification_task.apply_async(

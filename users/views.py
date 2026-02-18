@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
+from orders.models import VPSInstance
 from tickets.models import Ticket, TicketStatus
 
 from .forms import UserProfileForm
@@ -26,8 +27,6 @@ def dashboard(request):
     # Active VPS instances
     services = []
     if customer:
-        from orders.models import VPSInstance
-
         services = VPSInstance.objects.filter(
             customer=customer,
             status__in=["running", "stopped", "provisioning"],

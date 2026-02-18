@@ -1,4 +1,3 @@
 -r base.txt
 
-# Production server
-gunicorn==23.0.0
+# Production extras (gunicorn is already in base.txt)

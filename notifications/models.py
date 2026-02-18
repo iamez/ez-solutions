@@ -4,6 +4,12 @@ from django.conf import settings
 from django.db import models
 
 
+class NotificationChannel(models.TextChoices):
+    EMAIL = "email", "Email"
+    TELEGRAM = "telegram", "Telegram"
+    SIGNAL = "signal", "Signal"
+
+
 class NotificationPreference(models.Model):
     """Per-user channel preferences and contact identifiers for Telegram/Signal."""
 
@@ -68,7 +74,7 @@ class NotificationLog(models.Model):
         null=True,
         blank=True,
     )
-    channel = models.CharField(max_length=20)
+    channel = models.CharField(max_length=20, choices=NotificationChannel.choices)
     subject = models.CharField(max_length=255)
     recipient = models.CharField(max_length=255)
     success = models.BooleanField(default=False)

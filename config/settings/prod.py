@@ -55,5 +55,11 @@ try:
             traces_sample_rate=0.2,
             send_default_pii=False,
         )
-except (ImportError, Exception):  # noqa: BLE001, S110
-    pass  # sentry-sdk not installed or config error
+except ImportError:
+    pass  # sentry-sdk not installed — optional dependency
+except Exception as _sentry_exc:  # noqa: BLE001
+    import logging as _logging
+
+    _logging.getLogger("config.settings.prod").warning(
+        "Sentry initialization failed: %s", _sentry_exc
+    )

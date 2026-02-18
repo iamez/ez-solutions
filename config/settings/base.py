@@ -14,6 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Security
 # ---------------------------------------------------------------------------
 SECRET_KEY = config("DJANGO_SECRET_KEY")
+DEBUG = False  # overridden in dev.py; explicit False as a safety net
 ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
 # ---------------------------------------------------------------------------
@@ -229,6 +230,7 @@ STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", default="")
 # Email  (dev uses console backend; override in dev.py / prod.py)
 # ---------------------------------------------------------------------------
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@ez-solutions.com")
+SUPPORT_EMAIL = config("SUPPORT_EMAIL", default="support@ez-solutions.com")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # ---------------------------------------------------------------------------
@@ -260,6 +262,7 @@ AXES_RESET_ON_SUCCESS = True
 # ---------------------------------------------------------------------------
 CSP_REPORT_ONLY = True
 CSP_DEFAULT_SRC = ("'self'",)
+CSP_INCLUDE_NONCE_IN = ["script-src"]
 CSP_SCRIPT_SRC = (
     "'self'",
     "https://cdnjs.cloudflare.com",

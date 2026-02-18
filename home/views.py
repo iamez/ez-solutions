@@ -8,7 +8,7 @@ from services.models import ServicePlan
 def index(request):
     """Public landing page — passes active service plans for the pricing teaser."""
     plans = ServicePlan.objects.filter(is_active=True).prefetch_related("features")[:3]
-    return render(request, "users/home.html", {"plans": plans})
+    return render(request, "home/landing.html", {"plans": plans})
 
 
 def about(request):

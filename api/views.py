@@ -2,7 +2,7 @@
 
 from django.db import transaction
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
-from rest_framework import serializers, status
+from rest_framework import generics, serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
@@ -58,20 +58,15 @@ class HealthView(APIView):
 # ---------------------------------------------------------------------------
 
 
-class PlanListView(APIView):
-    """Return the active, ordered service plan catalog."""
+class PlanListView(generics.ListAPIView):
+    """Return the active, ordered service plan catalog (paginated)."""
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    serializer_class = ServicePlanSerializer
 
-    @extend_schema(
-        operation_id="v1_plans_list",
-        responses=ServicePlanSerializer(many=True),
-    )
-    def get(self, request):
-        plans = ServicePlan.objects.filter(is_active=True).prefetch_related("features")
-        serializer = ServicePlanSerializer(plans, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return ServicePlan.objects.filter(is_active=True).prefetch_related("features")
 
 
 # ---------------------------------------------------------------------------
@@ -79,34 +74,41 @@ class PlanListView(APIView):
 # ---------------------------------------------------------------------------
 
 
-class TicketListCreateView(APIView):
+class TicketListCreateView(generics.ListCreateAPIView):
     """
-    GET  /api/v1/tickets/ — list the authenticated user's tickets (newest first).
+    GET  /api/v1/tickets/ — list the authenticated user's tickets (paginated, newest first).
     POST /api/v1/tickets/ — open a new support ticket.
     """
 
     permission_classes = [IsAuthenticated]
+    serializer_class = TicketSerializer
 
     def get_throttles(self):
         if self.request.method == "POST":
             return [TicketCreateThrottle()]
         return super().get_throttles()
 
+    def get_queryset(self):
+        return self.request.user.tickets.prefetch_related("messages").all()
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return TicketCreateSerializer
+        return TicketSerializer
+
     @extend_schema(
         operation_id="v1_tickets_list",
         responses=TicketSerializer(many=True),
     )
-    def get(self, request):
-        tickets = request.user.tickets.prefetch_related("messages").all()
-        serializer = TicketSerializer(tickets, many=True)
-        return Response(serializer.data)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="v1_tickets_create",
         request=TicketCreateSerializer,
         responses={201: TicketSerializer, 400: OpenApiResponse(description="Validation error")},
     )
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = TicketCreateSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -236,6 +238,18 @@ class MeView(APIView):
                 {"detail": "Only first_name and last_name may be updated."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        # Validate values are strings within model max_length
+        for field, value in allowed.items():
+            if not isinstance(value, str):
+                return Response(
+                    {"detail": f"{field} must be a string."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if len(value) > 150:
+                return Response(
+                    {"detail": f"{field} must be at most 150 characters."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         for field, value in allowed.items():
             setattr(request.user, field, value)
         request.user.save(update_fields=list(allowed.keys()))

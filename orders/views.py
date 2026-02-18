@@ -4,7 +4,7 @@ import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -58,10 +58,12 @@ def create_checkout_session(request, plan_slug):
     try:
         customer = Customer.objects.get(user=request.user)
     except Customer.DoesNotExist:
-        customer = Customer.objects.create(
-            user=request.user,
-            stripe_customer_id=_get_or_create_stripe_customer(request.user),
-        )
+        with transaction.atomic():
+            stripe_id = _get_or_create_stripe_customer(request.user)
+            customer = Customer.objects.create(
+                user=request.user,
+                stripe_customer_id=stripe_id,
+            )
 
     success_url = request.build_absolute_uri(reverse("orders:billing")) + "?checkout=success"
     cancel_url = request.build_absolute_uri(reverse("services:pricing"))
@@ -86,6 +88,7 @@ def create_checkout_session(request, plan_slug):
 
 
 @login_required
+@require_POST
 def billing_portal(request):
     """Open the Stripe Customer Portal so users can manage their subscription."""
     try:

@@ -214,11 +214,11 @@ class TestCheckoutView:
 @pytest.mark.django_db
 class TestBillingPortalView:
     def test_portal_requires_login(self, client):
-        resp = client.get(BILLING_PORTAL_URL)
+        resp = client.post(BILLING_PORTAL_URL)
         assert resp.status_code == 302
 
     def test_portal_redirects_to_pricing_if_no_customer(self, client_logged_in):
-        resp = client_logged_in.get(BILLING_PORTAL_URL, follow=True)
+        resp = client_logged_in.post(BILLING_PORTAL_URL, follow=True)
         assert resp.status_code == 200
         assert resp.wsgi_request.path == reverse("services:pricing")
 
@@ -226,7 +226,7 @@ class TestBillingPortalView:
     def test_portal_redirects_to_stripe(self, mock_portal, client, user, customer):
         mock_portal.return_value = MagicMock(url="https://billing.stripe.com/portal/xyz")
         client.force_login(user)
-        resp = client.get(BILLING_PORTAL_URL)
+        resp = client.post(BILLING_PORTAL_URL)
         assert resp.status_code == 302
         assert resp["Location"] == "https://billing.stripe.com/portal/xyz"
 

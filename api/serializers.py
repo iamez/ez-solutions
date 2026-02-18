@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from orders.models import Subscription
-from services.models import ServicePlan
+from services.models import PlanFeature, ServicePlan
 from tickets.models import Ticket, TicketMessage
 
 User = get_user_model()
@@ -16,10 +16,18 @@ User = get_user_model()
 # ---------------------------------------------------------------------------
 
 
+class PlanFeatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlanFeature
+        fields = ["id", "text", "is_included", "sort_order"]
+        read_only_fields = fields
+
+
 class ServicePlanSerializer(serializers.ModelSerializer):
     """Read-only serializer for the pricing/plan catalog."""
 
     annual_savings = serializers.SerializerMethodField()
+    features = PlanFeatureSerializer(many=True, read_only=True)
 
     class Meta:
         model = ServicePlan
@@ -35,6 +43,7 @@ class ServicePlanSerializer(serializers.ModelSerializer):
             "is_featured",
             "sort_order",
             "annual_savings",
+            "features",
         ]
         read_only_fields = fields
 
@@ -85,7 +94,9 @@ class TicketSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "reference_short",
+            "subject",
             "status",
+            "priority",
             "is_open",
             "message_count",
             "messages",

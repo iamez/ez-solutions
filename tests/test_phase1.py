@@ -8,6 +8,8 @@ from django.urls import reverse
 
 from users.models import User
 
+from .conftest import TEST_USER_PASSWORD
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -72,7 +74,7 @@ class TestLogin:
     def test_valid_login_redirects_to_dashboard(self, client, user):
         resp = client.post(
             LOGIN_URL,
-            {"login": user.email, "password": "StrongPass123!"},
+            {"login": user.email, "password": TEST_USER_PASSWORD},
             follow=True,
         )
         assert resp.status_code == 200

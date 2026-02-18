@@ -7,13 +7,17 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+# Shared test credentials — use these constants instead of hardcoding passwords.
+TEST_USER_PASSWORD = "StrongPass123!"
+TEST_ADMIN_PASSWORD = "AdminPass123!"
+
 
 @pytest.fixture
 def user(db):
     """A basic active user."""
     return User.objects.create_user(
         email="test@ez-solutions.com",
-        password="StrongPass123!",
+        password=TEST_USER_PASSWORD,
         first_name="Test",
         last_name="User",
     )
@@ -24,7 +28,7 @@ def superuser(db):
     """A superuser for admin tests."""
     return User.objects.create_superuser(
         email="admin@ez-solutions.com",
-        password="AdminPass123!",
+        password=TEST_ADMIN_PASSWORD,
     )
 
 

@@ -9,6 +9,8 @@ from orders.models import Customer, Subscription, SubscriptionStatus
 from services.models import ServicePlan
 from tickets.models import Ticket, TicketMessage, TicketPriority, TicketStatus
 
+from .conftest import TEST_USER_PASSWORD
+
 HEALTH_URL = "/api/health/"
 SCHEMA_URL = "/api/v1/schema/"
 DOCS_URL = "/api/v1/docs/"
@@ -148,7 +150,7 @@ class TestApiDocsAndJwt:
         assert "text/html" in resp["Content-Type"]
 
     def test_token_obtain_pair_returns_tokens(self, api_client, user):
-        resp = api_client.post(TOKEN_URL, {"email": user.email, "password": "StrongPass123!"})
+        resp = api_client.post(TOKEN_URL, {"email": user.email, "password": TEST_USER_PASSWORD})
         assert resp.status_code == 200
         data = resp.json()
         assert "access" in data
@@ -157,7 +159,7 @@ class TestApiDocsAndJwt:
     def test_token_refresh_returns_new_access_token(self, api_client, user):
         obtain = api_client.post(
             TOKEN_URL,
-            {"email": user.email, "password": "StrongPass123!"},
+            {"email": user.email, "password": TEST_USER_PASSWORD},
         )
         assert obtain.status_code == 200
         refresh_token = obtain.json()["refresh"]
@@ -182,14 +184,16 @@ class TestPlanList:
     def test_lists_active_plans_only(self, api_client, plan, inactive_plan):
         resp = api_client.get(PLANS_URL)
         assert resp.status_code == 200
-        slugs = [p["slug"] for p in resp.json()]
+        results = resp.json()["results"]
+        slugs = [p["slug"] for p in results]
         assert plan.slug in slugs
         assert inactive_plan.slug not in slugs
 
     def test_annual_savings_computed(self, api_client, featured_plan):
         resp = api_client.get(PLANS_URL)
         assert resp.status_code == 200
-        data = next(p for p in resp.json() if p["slug"] == featured_plan.slug)
+        results = resp.json()["results"]
+        data = next(p for p in results if p["slug"] == featured_plan.slug)
         # 29 * 12 - 290 = 58 → savings
         assert data["annual_savings"] is not None
         assert float(data["annual_savings"]) == pytest.approx(58.0)
@@ -197,7 +201,8 @@ class TestPlanList:
     def test_annual_savings_null_when_no_annual_price(self, api_client, plan):
         resp = api_client.get(PLANS_URL)
         assert resp.status_code == 200
-        data = next(p for p in resp.json() if p["slug"] == plan.slug)
+        results = resp.json()["results"]
+        data = next(p for p in results if p["slug"] == plan.slug)
         assert data["annual_savings"] is None
 
     def test_no_auth_required(self, api_client):
@@ -219,8 +224,9 @@ class TestTicketList:
     def test_returns_own_tickets(self, auth_client, ticket):
         resp = auth_client.get(TICKETS_URL)
         assert resp.status_code == 200
-        assert len(resp.json()) == 1
-        assert resp.json()[0]["subject"] == "API test ticket"
+        results = resp.json()["results"]
+        assert len(results) == 1
+        assert results[0]["subject"] == "API test ticket"
 
     def test_does_not_return_other_users_tickets(self, db, auth_client, user):
         from django.contrib.auth import get_user_model
@@ -231,7 +237,7 @@ class TestTicketList:
         Ticket.objects.create(user=other, subject="Other ticket", status=TicketStatus.OPEN)
         resp = auth_client.get(TICKETS_URL)
         assert resp.status_code == 200
-        assert len(resp.json()) == 0
+        assert len(resp.json()["results"]) == 0
 
 
 @pytest.mark.django_db

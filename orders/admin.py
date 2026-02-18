@@ -53,8 +53,9 @@ class PaymentEventAdmin(admin.ModelAdmin):
     list_display = ("stripe_event_id", "event_type", "processed_at")
     list_filter = ("event_type",)
     search_fields = ("stripe_event_id", "event_type")
-    readonly_fields = ("stripe_event_id", "event_type", "processed_at", "payload")
+    readonly_fields = ("stripe_event_id", "event_type", "processed_at", "status", "error_message")
     list_per_page = 25
+    exclude = ("payload",)  # full Stripe payloads may contain PII
 
     def has_add_permission(self, request):
         return False  # events are logged by webhooks only
@@ -102,4 +103,4 @@ class VPSInstanceAdmin(admin.ModelAdmin):
     )
     list_filter = ("status", "created_at")
     search_fields = ("hostname", "ip_address", "customer__user__email", "proxmox_vmid")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at", "credentials_ref")

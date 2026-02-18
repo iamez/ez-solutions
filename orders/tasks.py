@@ -31,6 +31,11 @@ def process_stripe_event(payment_event_id: int) -> None:
         log.warning("PaymentEvent %s disappeared before processing", payment_event_id)
         return
 
+    # Guard: skip if already processed/failed (prevents double-processing on retry)
+    if payment_event.status in (EventStatus.PROCESSED, EventStatus.SKIPPED):
+        log.info("PaymentEvent %s already %s — skipping", payment_event_id, payment_event.status)
+        return
+
     if payment_event.event_type not in HANDLED_EVENTS:
         payment_event.status = EventStatus.SKIPPED
         payment_event.processed_at = timezone.now()
