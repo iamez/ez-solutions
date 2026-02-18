@@ -1,0 +1,17 @@
+Hi {{ name }},
+
+We were unable to process your payment of {{ amount }} {{ currency }}.
+
+Please update your payment method to avoid any interruption to your service:
+{{ billing_url }}
+
+If your payment details are already up to date, your bank may have declined the charge. Please contact them for more information.
+
+Need help? Contact support: {{ support_url }}
+
+Thanks,
+EZ Solutions
+
+---
+To unsubscribe from these emails, visit: {{ unsubscribe_url }}
+Manage notification preferences: {{ preferences_url }}

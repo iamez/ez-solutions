@@ -98,3 +98,23 @@ def send_ticket_notification_email(
     msg = EmailMultiAlternatives(subject, text_body, None, [recipient_email])
     msg.attach_alternative(html_body, "text/html")
     return msg.send(fail_silently=False)
+
+
+def send_payment_failed_email(user_email: str, first_name: str, amount: str, currency: str) -> int:
+    greeting_name = first_name or "there"
+    subject = "Action required: payment failed"
+    ctx = {
+        "name": greeting_name,
+        "amount": amount,
+        "currency": currency.upper(),
+        "billing_url": f"{_site_url()}/billing/",
+        "support_url": f"{_site_url()}/tickets/create/",
+        "year": timezone.now().year,
+        "unsubscribe_url": _unsubscribe_url(user_email),
+        "preferences_url": f"{_site_url()}/notifications/preferences/",
+    }
+    text_body = render_to_string("emails/payment_failed.txt", ctx)
+    html_body = render_to_string("emails/payment_failed.html", ctx)
+    msg = EmailMultiAlternatives(subject, text_body, None, [user_email])
+    msg.attach_alternative(html_body, "text/html")
+    return msg.send(fail_silently=False)

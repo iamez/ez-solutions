@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import datetime
 import logging
+from decimal import Decimal
 
 import stripe
 
 from services.models import ServicePlan
 from users.models import SubscriptionTier
 
-from .models import Customer, Subscription
+from .models import Customer, Order, OrderStatus, ProvisioningJob, Subscription
 
 log = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ HANDLED_EVENTS = {
     "checkout.session.completed",
     "customer.subscription.updated",
     "customer.subscription.deleted",
+    "invoice.payment_failed",
 }
 
 
@@ -27,6 +29,8 @@ def handle_event(event: dict) -> None:
         _handle_checkout_completed(data)
     elif event_type.startswith("customer.subscription."):
         _handle_subscription_change(data)
+    elif event_type == "invoice.payment_failed":
+        _handle_payment_failed(data)
 
 
 def _handle_checkout_completed(session: dict) -> None:
@@ -42,11 +46,32 @@ def _handle_checkout_completed(session: dict) -> None:
         return
 
     stripe_sub = stripe.Subscription.retrieve(stripe_sub_id)
-    _upsert_subscription(customer, stripe_sub)
+    sub = _upsert_subscription(customer, stripe_sub)
 
     plan_slug = session.get("metadata", {}).get("plan_slug", "")
     plan = _get_plan(plan_slug)
     _update_user_tier(customer.user, plan)
+
+    # Create Order record
+    order = None
+    if plan:
+        amount_cents = session.get("amount_total") or 0
+        order = Order.objects.create(
+            customer=customer,
+            service_plan=plan,
+            subscription=sub,
+            status=OrderStatus.PAID,
+            stripe_checkout_session_id=session.get("id", ""),
+            stripe_payment_intent_id=session.get("payment_intent", ""),
+            amount_total=Decimal(amount_cents) / Decimal("100"),
+            currency=session.get("currency", "usd"),
+            metadata=session.get("metadata", {}),
+        )
+
+    # Queue VPS provisioning for paid plans with a tier
+    if order and plan and plan.tier_key:
+        _queue_provisioning(order)
+
     plan_name = plan.name if plan else plan_slug.replace("-", " ").title() or "Your selected plan"
     _queue_checkout_success_email(customer.user.pk, plan_name)
 
@@ -62,10 +87,12 @@ def _handle_subscription_change(subscription: dict) -> None:
         stripe_subscription_id=subscription.get("id", ""),
     ).first()
     previous_status = existing.status if existing else ""
-    _upsert_subscription(customer, subscription)
+    sub = _upsert_subscription(customer, subscription)
 
     new_status = subscription.get("status", "")
-    if new_status in ("canceled", "unpaid", "incomplete_expired"):
+    if new_status in ("active", "trialing"):
+        _sync_tier_from_price(customer.user, sub.stripe_price_id)
+    elif new_status in ("canceled", "unpaid", "incomplete_expired"):
         customer.user.subscription_tier = SubscriptionTier.FREE  # type: ignore[attr-defined]
         customer.user.save(update_fields=["subscription_tier"])
         if previous_status != new_status:
@@ -119,6 +146,36 @@ def _update_user_tier(user, plan) -> None:
     if new_tier:
         user.subscription_tier = new_tier
         user.save(update_fields=["subscription_tier"])
+
+
+def _sync_tier_from_price(user, stripe_price_id: str) -> None:
+    """Look up a ServicePlan by its Stripe price ID and update the user tier."""
+    if not stripe_price_id:
+        return
+    plan = (
+        ServicePlan.objects.filter(stripe_price_id_monthly=stripe_price_id).first()
+        or ServicePlan.objects.filter(stripe_price_id_annual=stripe_price_id).first()
+    )
+    _update_user_tier(user, plan)
+
+
+def _queue_provisioning(order: Order) -> None:
+    """Create a ProvisioningJob and dispatch the async task."""
+    from .tasks import provision_vps_task
+
+    job = ProvisioningJob.objects.create(
+        order=order,
+        provider="demo",
+        payload={
+            "plan_slug": order.service_plan.slug,
+            "tier_key": order.service_plan.tier_key,
+        },
+    )
+    try:
+        provision_vps_task.apply_async(args=[job.pk], ignore_result=True)
+    except Exception:  # noqa: BLE001
+        log.exception("Provisioning task enqueue failed for job %s; running synchronously", job.pk)
+        provision_vps_task.run(job.pk)
 
 
 def _queue_checkout_success_email(user_id: int, plan_name: str) -> None:
@@ -217,5 +274,86 @@ def _queue_cancellation_notifications(user_id: int) -> None:
     except Exception:  # noqa: BLE001
         log.exception(
             "Multi-channel admin notification failed for cancellation user %s",
+            user_id,
+        )
+
+
+def _handle_payment_failed(invoice: dict) -> None:
+    """Handle invoice.payment_failed — notify user of failed recurring payment."""
+    stripe_customer_id = invoice.get("customer")
+    if not stripe_customer_id:
+        return
+
+    try:
+        customer = Customer.objects.get(stripe_customer_id=stripe_customer_id)
+    except Customer.DoesNotExist:
+        log.warning("Payment failed for unknown customer %s", stripe_customer_id)
+        return
+
+    amount_cents = invoice.get("amount_due") or 0
+    amount = str(Decimal(amount_cents) / Decimal("100"))
+    currency = invoice.get("currency", "usd")
+
+    _queue_payment_failed_email(customer.user.pk, amount, currency)
+
+
+def _queue_payment_failed_email(user_id: int, amount: str, currency: str) -> None:
+    from .tasks import send_payment_failed_email_task
+
+    try:
+        send_payment_failed_email_task.apply_async(
+            args=[user_id, amount, currency], ignore_result=True
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Payment-failed email enqueue failed for user %s; sending synchronously",
+            user_id,
+        )
+        send_payment_failed_email_task.run(user_id, amount, currency)
+
+    # Multi-channel dispatch (email + telegram + signal)
+    _queue_payment_failed_notifications(user_id, amount, currency)
+
+
+def _queue_payment_failed_notifications(user_id: int, amount: str, currency: str) -> None:
+    from notifications.tasks import (
+        send_admin_notification_task,
+        send_notification_task,
+    )
+
+    user_body = (
+        f"Your payment of {amount} {currency.upper()} failed. "
+        "Please update your payment method to avoid service interruption."
+    )
+    user_html = (
+        f"<p>Your payment of <strong>{amount} {currency.upper()}</strong> failed. "
+        "Please update your payment method to avoid service interruption.</p>"
+    )
+    try:
+        send_notification_task.apply_async(
+            args=[user_id, "Payment failed", user_body],
+            kwargs={"html_body": user_html},
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Multi-channel user notification failed for payment-failed user %s",
+            user_id,
+        )
+
+    admin_body = f"User {user_id} payment of {amount} {currency.upper()} failed."
+    admin_html = (
+        f"<p>User <strong>{user_id}</strong> payment of "
+        f"<strong>{amount} {currency.upper()}</strong> failed.</p>"
+    )
+    try:
+        send_admin_notification_task.apply_async(
+            args=["Payment failed", admin_body],
+            kwargs={"html_body": admin_html},
+            ignore_result=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception(
+            "Multi-channel admin notification failed for payment-failed user %s",
             user_id,
         )

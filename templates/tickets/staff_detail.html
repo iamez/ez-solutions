@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Staff — Ticket #{{ ticket.reference_short }} — EZ Solutions{% endblock %}
+
+{% block content %}
+<section class="bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+            <div class="flex items-start gap-3">
+                <a href="{% url 'tickets:staff_list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ ticket.subject }}</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">
+                        Ticket <span class="font-semibold">#{{ ticket.reference_short }}</span> · Opened {{ ticket.created_at|date:"N j, Y" }} · By <span class="font-semibold">{{ ticket.user.email }}</span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex gap-2 items-center flex-wrap">
+                {% if ticket.priority == "urgent" %}
+                <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Urgent</span>
+                {% elif ticket.priority == "high" %}
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">High</span>
+                {% elif ticket.priority == "normal" %}
+                <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">Normal</span>
+                {% else %}
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Low</span>
+                {% endif %}
+
+                {% if ticket.status == "open" %}
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Open</span>
+                {% elif ticket.status == "in_progress" %}
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">In Progress</span>
+                {% elif ticket.status == "waiting" %}
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">Waiting on Customer</span>
+                {% elif ticket.status == "resolved" %}
+                <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">Resolved</span>
+                {% else %}
+                <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">Closed</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Change Status -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-4 mb-6">
+            <form method="post" class="flex flex-col sm:flex-row sm:items-center gap-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="status">
+                <label for="status-select" class="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">Change Status:</label>
+                <select id="status-select" name="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full sm:w-56 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    {% for val, label in status_choices %}
+                    <option value="{{ val }}" {% if ticket.status == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Update Status
+                </button>
+            </form>
+        </div>
+
+        <!-- Message Thread -->
+        <div class="space-y-4 mb-6">
+            {% for msg in thread %}
+            <div class="{% if msg.is_staff_reply %}bg-primary-50 dark:bg-gray-700{% else %}bg-white dark:bg-gray-800{% endif %} rounded-lg shadow-sm p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-semibold {% if msg.is_staff_reply %}text-primary-700 dark:text-primary-400{% else %}text-gray-900 dark:text-white{% endif %}">
+                        {% if msg.is_staff_reply %}
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg>
+                        {{ msg.sender.email|default:"Staff" }} <span class="text-xs font-normal text-primary-500 dark:text-primary-300">(Staff)</span>
+                        {% else %}
+                        {{ msg.sender.full_name|default:msg.sender.email }}
+                        {% endif %}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ msg.created_at|date:"N j, Y g:i A" }}</span>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ msg.body }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Staff Reply Form -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h6 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Staff Reply</h6>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reply">
+                <textarea name="body" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Type your staff reply…">{{ reply_form.body.value|default_if_none:'' }}</textarea>
+                {% if reply_form.body.errors %}
+                <p class="text-sm text-red-600 dark:text-red-400">{{ reply_form.body.errors.0 }}</p>
+                {% endif %}
+                <div class="flex items-center gap-3">
+                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                        Send Staff Reply
+                    </button>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Status will auto-change to "Waiting on Customer"</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

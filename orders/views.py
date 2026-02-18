@@ -4,6 +4,7 @@ import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,7 +14,7 @@ from django.views.decorators.http import require_POST
 
 from services.models import ServicePlan
 
-from .models import Customer, PaymentEvent, SubscriptionStatus
+from .models import Customer, Order, PaymentEvent, SubscriptionStatus
 from .tasks import process_stripe_event
 from .webhooks import HANDLED_EVENTS, handle_event
 
@@ -42,6 +43,22 @@ def billing(request):
         pass
 
     return render(request, "orders/billing.html", {"subscription": subscription})
+
+
+@login_required
+def order_history(request):
+    """Show the user's order history, paginated."""
+    orders = Order.objects.none()
+    try:
+        customer = request.user.stripe_customer
+        orders = customer.orders.select_related("service_plan").order_by("-created_at")
+    except Customer.DoesNotExist:
+        pass
+
+    paginator = Paginator(orders, 15)
+    page = paginator.get_page(request.GET.get("page"))
+
+    return render(request, "orders/order_history.html", {"orders": page})
 
 
 @login_required
