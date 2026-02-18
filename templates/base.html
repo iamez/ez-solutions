@@ -5,23 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}EZ Solutions{% endblock %}</title>
-    
+
+    <!-- Dark mode: apply before any CSS to prevent flash of wrong theme -->
+    <script nonce="{{ request.csp_nonce }}">
+        (function () {
+            var stored = localStorage.getItem('color-theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored === 'dark' || (!stored && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Tailwind CSS (Local Build) -->
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
-    <!-- Flowbite -->
-    <script nonce="{{ request.csp_nonce }}">
-        // Check for dark mode preference
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
-    </script>
 
     <!-- Flowbite -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" integrity="sha512-mMwynEBiXwV3KQGXOOA4ek2v2MhYBZCB0ZI0yrR0YkyGEYmSNotPZVDMD78cpSJH+OEYA8Pm46GGerphkEPgg==" crossorigin="anonymous" referrerpolicy="no-referrer" />

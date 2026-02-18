@@ -45,19 +45,19 @@
         <!-- Message Thread -->
         <div class="space-y-4 mb-6">
             {% for msg in thread %}
-            <div class="{% if msg.is_staff_reply %}bg-primary-50 dark:bg-gray-700{% else %}bg-white dark:bg-gray-800{% endif %} rounded-lg shadow-sm p-5">
+            <div class="{% if msg.is_staff_reply %}bg-primary-50 dark:bg-gray-700 border-l-4 border-primary-400{% else %}bg-white dark:bg-gray-800{% endif %} rounded-lg shadow-sm p-5">
                 <div class="flex justify-between items-center mb-3">
-                    <span class="text-sm font-semibold {% if msg.is_staff_reply %}text-primary-700 dark:text-primary-400{% else %}text-gray-900 dark:text-white{% endif %}">
+                    <span class="text-sm font-semibold {% if msg.is_staff_reply %}text-primary-700 dark:text-primary-400{% else %}text-gray-900 dark:text-white{% endif %} flex items-center gap-1">
                         {% if msg.is_staff_reply %}
-                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg>
-                        EZ Solutions Support
+                        <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg>
+                        <strong>EZ Solutions Support</strong>
                         {% else %}
                         {{ msg.sender.full_name|default:msg.sender.email }}
                         {% endif %}
                     </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ msg.created_at|date:"N j, Y g:i A" }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ msg.created_at|date:"N j, Y g:i A" }} UTC</span>
                 </div>
-                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ msg.body }}</p>
+                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{{ msg.body }}</p>
             </div>
             {% endfor %}
         </div>
@@ -66,22 +66,40 @@
         {% if ticket.is_open %}
         <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
             <h6 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Add a Reply</h6>
-            <form method="post" class="space-y-4">
+            <form method="post" class="space-y-4" id="reply-form">
                 {% csrf_token %}
-                <textarea name="body" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Type your reply...">{{ reply_form.body.value|default_if_none:'' }}</textarea>
+                <div>
+                    <textarea name="body" id="reply-body" rows="4" aria-label="Reply message" maxlength="2000"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Type your reply...">{{ reply_form.body.value|default_if_none:'' }}</textarea>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Max 2000 characters</p>
+                </div>
                 {% if reply_form.body.errors %}
                 <p class="text-sm text-red-600 dark:text-red-400">{{ reply_form.body.errors.0 }}</p>
                 {% endif %}
-                <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                <button type="submit" id="reply-btn" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-60 disabled:cursor-not-allowed">
                     Send Reply
                 </button>
             </form>
         </div>
         {% else %}
         <div class="p-4 text-sm text-gray-800 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 text-center">
-            This ticket is closed. <a href="{% url 'tickets:create' %}" class="font-medium text-primary-600 hover:underline dark:text-primary-400">Open a new ticket</a> if you need further help.
+            This ticket is closed.
+            <a href="{% url 'tickets:create' %}" class="inline-block mt-3 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Open a New Ticket</a>
         </div>
         {% endif %}
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script nonce="{{ request.csp_nonce }}">
+    var replyForm = document.getElementById('reply-form');
+    if (replyForm) {
+        replyForm.addEventListener('submit', function () {
+            var btn = document.getElementById('reply-btn');
+            btn.disabled = true;
+            btn.textContent = 'Sending\u2026';
+        });
+    }
+</script>
 {% endblock %}

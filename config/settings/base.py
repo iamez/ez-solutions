@@ -41,7 +41,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
-    # Monitoring
+    # Monitoring (django-health-check 4.x — no sub-apps needed)
     "health_check",
     # Celery beat
     "django_celery_beat",
@@ -245,6 +245,28 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
+# Reliability — re-queue the message if the worker crashes mid-execution
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+
+# Result expiry — avoid unbounded Redis memory growth (keep results 1 hour)
+CELERY_RESULT_EXPIRES = 3600
+
+# Fair dispatch — essential when combined with acks_late
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+
+# Task routing — dedicated queue for long-running provisioning jobs
+CELERY_TASK_ROUTES = {
+    "orders.tasks.provision_vps_task": {"queue": "provisioning"},
+    "orders.periodic.check_expiring_subscriptions": {"queue": "periodic"},
+    "orders.periodic.cleanup_stale_provisioning_jobs": {"queue": "periodic"},
+    "orders.periodic.cleanup_old_payment_events": {"queue": "periodic"},
+}
+CELERY_TASK_DEFAULT_QUEUE = "default"
+
+# Broker connection retry on startup (silences Celery ≥5.3 deprecation warning)
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
 # ---------------------------------------------------------------------------
 # Sentry (optional; only activates when DSN is set)
 # ---------------------------------------------------------------------------
@@ -291,7 +313,7 @@ CSP_CONNECT_SRC = (
 # ---------------------------------------------------------------------------
 # Notifications — multi-channel (email + Telegram + Signal)
 # ---------------------------------------------------------------------------
-SITE_URL = config("SITE_URL", default="http://localhost:8000")
+SITE_URL = config("SITE_URL", default="http://localhost:7000")
 
 # Telegram Bot (create via @BotFather; messages encrypted in transit via TLS)
 TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
@@ -326,6 +348,9 @@ LOGGING = {
         "notifications": {"handlers": ["console"], "level": "INFO", "propagate": False},
         "users": {"handlers": ["console"], "level": "INFO", "propagate": False},
         "api": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        # Permanent task failures — ERROR level so Sentry captures them
+        "celery.failure": {"handlers": ["console"], "level": "ERROR", "propagate": True},
+        "celery": {"handlers": ["console"], "level": "WARNING", "propagate": False},
     },
     "root": {
         "handlers": ["console"],

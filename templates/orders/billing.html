@@ -15,13 +15,6 @@
             </div>
         </div>
 
-        {% if request.GET.checkout == "success" %}
-        <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 flex items-center gap-2" role="alert">
-            <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            <span><strong>Welcome aboard!</strong> Your subscription is now active. It may take a moment to update.</span>
-        </div>
-        {% endif %}
-
         <!-- Current Plan -->
         <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
             <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -55,20 +48,20 @@
                     </p>
                     {% endif %}
                     {% else %}
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">You are on the free tier.</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">You are on the free tier. Upgrade to access VPS hosting, priority support, and more.</p>
                     {% endif %}
                 </div>
                 <div class="flex flex-wrap gap-2">
                     {% if subscription %}
                     <form method="post" action="{% url 'orders:billing_portal' %}" class="inline">
                         {% csrf_token %}
-                        <button type="submit" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-4 py-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">
-                            Manage Subscription
+                        <button type="submit" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-4 py-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700" title="Opens the Stripe billing portal in a new tab">
+                            Manage Plan &amp; Payment →
                         </button>
                     </form>
                     {% endif %}
                     <a href="{% url 'services:pricing' %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                        {% if request.user.is_paid %}Change Plan{% else %}Upgrade{% endif %}
+                        {% if request.user.is_paid %}Change Plan{% else %}Upgrade now — unlock VPS hosting &amp; priority support{% endif %}
                     </a>
                 </div>
             </div>

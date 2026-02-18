@@ -50,6 +50,13 @@ def billing(request):
     except Customer.DoesNotExist:
         pass
 
+    if request.GET.get("checkout") == "success":
+        messages.success(
+            request,
+            "Welcome aboard! Your subscription is now active. It may take a moment to update.",
+        )
+        return redirect("orders:billing")
+
     return render(request, "orders/billing.html", {"subscription": subscription})
 
 

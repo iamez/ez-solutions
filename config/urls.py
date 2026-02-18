@@ -6,7 +6,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
+from health_check.checks import Database
+from health_check.contrib.celery import Ping as CeleryPing
+from health_check.contrib.redis import Redis as RedisCheck
 from health_check.views import HealthCheckView
+from redis.asyncio import Redis as RedisClient
 
 from home.sitemaps import PricingSitemap, StaticSitemap
 
@@ -18,12 +22,23 @@ sitemaps = {
 urlpatterns = [
     # Admin
     path(config("ADMIN_URL", default="admin/"), admin.site.urls),
-    # Infrastructure health endpoint (DB + migrations)
+    # Infrastructure health endpoint (DB + Redis + Celery worker ping)
+    # django-health-check 4.x: checks is a list of (Class, kwargs_dict) tuples,
+    # or plain class references for zero-arg checks.
     path(
         "ht/",
         HealthCheckView.as_view(
             checks=[
-                "health_check.checks.Database",
+                Database,
+                (
+                    RedisCheck,
+                    {
+                        "client": RedisClient.from_url(
+                            config("REDIS_URL", default="redis://localhost:6379/0")
+                        )
+                    },
+                ),
+                CeleryPing,
             ]
         ),
         name="health-check",

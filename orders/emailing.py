@@ -7,7 +7,7 @@ from django.utils import timezone
 
 
 def _site_url() -> str:
-    return getattr(settings, "SITE_URL", "http://localhost:8000")
+    return getattr(settings, "SITE_URL", "http://localhost:7000")
 
 
 def _unsubscribe_url(user_email: str) -> str:

@@ -8,29 +8,35 @@ MANAGE   := $(PYTHON) manage.py --settings=config.settings.dev
 PYTEST   := ./venv/Scripts/pytest.exe
 RUFF     := ./venv/Scripts/ruff.exe
 BLACK    := ./venv/Scripts/black.exe
+CELERY   := ./venv/Scripts/celery.exe
 
 .DEFAULT_GOAL := help
 
 .PHONY: help install dev migrate seed test lint format security check-all \
-        run shell superuser clean
+        run shell superuser clean \
+        worker worker-provisioning beat periodic-tasks
 
 help:
 	@echo ""
 	@echo "EZ Solutions — available make targets"
 	@echo "────────────────────────────────────────────────────────"
-	@echo "  install      Install all dev dependencies"
-	@echo "  dev          Install deps + migrate + seed plans"
-	@echo "  migrate      Run migrations"
-	@echo "  seed         Seed sample service plans"
-	@echo "  test         Run test suite with coverage"
-	@echo "  lint         Run ruff + black check"
-	@echo "  format       Auto-format with ruff + black"
-	@echo "  security     Run bandit + pip-audit"
-	@echo "  check-all    lint + test + security"
-	@echo "  run          Start dev server on :8000"
-	@echo "  shell        Django shell"
-	@echo "  superuser    Create superuser interactively"
-	@echo "  clean        Remove cache / compiled files"
+	@echo "  install           Install all dev dependencies"
+	@echo "  dev               Install deps + migrate + seed plans"
+	@echo "  migrate           Run migrations"
+	@echo "  seed              Seed sample service plans"
+	@echo "  test              Run test suite with coverage"
+	@echo "  lint              Run ruff + black check"
+	@echo "  format            Auto-format with ruff + black"
+	@echo "  security          Run bandit + pip-audit"
+	@echo "  check-all         lint + test + security"
+	@echo "  run               Start dev server on :7000"
+	@echo "  shell             Django shell"
+	@echo "  superuser         Create superuser interactively"
+	@echo "  clean             Remove cache / compiled files"
+	@echo "  worker            Start Celery worker (default + provisioning queues)"
+	@echo "  worker-provisioning Start dedicated provisioning queue worker"
+	@echo "  beat              Start Celery Beat scheduler"
+	@echo "  periodic-tasks    Manually register periodic tasks in the DB"
 	@echo ""
 
 install:
@@ -68,7 +74,7 @@ check-all: lint test security
 	@echo "✅ All checks passed!"
 
 run:
-	$(MANAGE) runserver
+	$(MANAGE) runserver 7000
 
 shell:
 	$(MANAGE) shell
@@ -84,3 +90,28 @@ clean:
 	find . -type d -name "htmlcov" -exec rm -rf {} + 2>/dev/null || true
 	rm -f .coverage coverage.xml bandit-report.json
 	@echo "✅ Cleaned up"
+
+# ── Celery ────────────────────────────────────────────────────────────────────
+
+worker:
+	$(CELERY) -A config worker \
+		--loglevel=info \
+		--queues=default,provisioning,periodic \
+		--concurrency=4 \
+		--hostname=worker@%h
+
+worker-provisioning:
+	$(CELERY) -A config worker \
+		--loglevel=info \
+		--queues=provisioning \
+		--concurrency=2 \
+		--hostname=worker-provisioning@%h
+
+beat:
+	$(CELERY) -A config beat \
+		--loglevel=info \
+		--scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+periodic-tasks:
+	$(MANAGE) setup_periodic_tasks
+

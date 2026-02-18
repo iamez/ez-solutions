@@ -43,15 +43,33 @@ ANYMAIL = {
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())  # noqa: F405
 
+# ---------------------------------------------------------------------------
+# Celery — production overrides
+# Redis URL must be set via REDIS_URL env var in production.
+# Use rediss:// (TLS) when your provider supports it, e.g.:
+#   REDIS_URL=rediss://:password@your-redis-host:6380/0
+# ---------------------------------------------------------------------------
+_redis_url = config("REDIS_URL", default="redis://localhost:6379/0")  # noqa: F405
+
+CELERY_BROKER_URL = _redis_url
+CELERY_RESULT_BACKEND = _redis_url
+
+# Must be >= the longest task time_limit (provision_vps_task = 300 s)
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "visibility_timeout": 3600,
+    "max_retries": 5,
+}
+
 # Sentry
 try:
     if SENTRY_DSN:  # noqa: F405
         import sentry_sdk
+        from sentry_sdk.integrations.celery import CeleryIntegration
         from sentry_sdk.integrations.django import DjangoIntegration
 
         sentry_sdk.init(
             dsn=SENTRY_DSN,  # noqa: F405
-            integrations=[DjangoIntegration()],
+            integrations=[DjangoIntegration(), CeleryIntegration()],
             traces_sample_rate=0.2,
             send_default_pii=False,
         )

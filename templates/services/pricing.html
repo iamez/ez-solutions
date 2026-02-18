@@ -17,7 +17,7 @@
         {% if plans %}
         <div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
             {% for plan in plans %}
-            <div class="flex flex-col p-6 mx-auto max-w-lg text-center bg-white rounded-lg border {% if plan.is_featured %}border-primary-600 border-2 ring-2 ring-primary-100 dark:ring-primary-900{% else %}border-gray-100{% endif %} shadow dark:border-gray-600 dark:bg-gray-800 w-full">
+            <div class="flex flex-col p-6 mx-auto max-w-lg text-center bg-white rounded-lg border {% if plan.is_featured %}border-primary-600 border-2 ring-2 ring-primary-100 dark:ring-primary-900{% else %}border-gray-200{% endif %} shadow dark:border-gray-600 dark:bg-gray-800 w-full">
                 {% if plan.is_featured %}
                 <div class="-mt-6 mb-4">
                     <span class="bg-primary-600 text-white text-xs font-semibold px-3 py-1 rounded-full">Most Popular</span>
@@ -42,7 +42,7 @@
                         <span class="text-gray-700 dark:text-gray-300">{{ feature.text }}</span>
                         {% else %}
                         <svg class="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                        <span class="text-gray-400 dark:text-gray-500 line-through">{{ feature.text }}</span>
+                        <span class="text-gray-400 dark:text-gray-500 line-through" title="Not included in this plan — upgrade to unlock">{{ feature.text }}</span>
                         {% endif %}
                     </li>
                     {% endfor %}
@@ -59,14 +59,15 @@
             </div>
             {% endfor %}
         </div>
-        <div class="text-center mt-10">
+        <div class="text-center mt-10 space-y-2">
             <p class="text-gray-500 dark:text-gray-400">Questions? <a href="{% url 'tickets:create' %}" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Contact us</a> — we're happy to help.</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">All plans include a 14-day free trial. After the trial, we'll ask before charging anything.</p>
         </div>
         {% else %}
         <div class="text-center py-16">
             <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-            <h3 class="text-xl font-bold text-gray-500 dark:text-gray-400 mb-2">Plans coming soon</h3>
-            <p class="text-gray-400 dark:text-gray-500">We're finalizing our pricing. <a href="{% url 'home:about' %}" class="text-primary-600 hover:underline">Get in touch</a> for early access.</p>
+            <h3 class="text-xl font-bold text-gray-500 dark:text-gray-400 mb-2">Pricing is being updated</h3>
+            <p class="text-gray-400 dark:text-gray-500 mb-4">We're finalising our plans. <a href="{% url 'tickets:create' %}" class="text-primary-600 hover:underline">Get in touch</a> for current rates or early access.</p>
         </div>
         {% endif %}
     </div>

@@ -1,145 +1,170 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Managed Cloud Hosting & IT Services — EZ Solutions{% endblock %}
+{% block title %}EZ Solutions — Linux, Security, Networking & Managed Hosting{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="bg-white dark:bg-gray-900 border-b dark:border-gray-800">
-    <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
-        <div class="mr-auto place-self-center lg:col-span-7">
-            <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
-                Reliable Cloud Hosting & <br>
-                <span class="text-primary-600 dark:text-primary-500">Managed IT Services</span>
+    <div class="max-w-screen-xl px-4 py-12 mx-auto lg:py-24">
+        <div class="max-w-3xl">
+            <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+                We build, harden &amp;
+                <span class="text-primary-600 dark:text-primary-500">run the stack.</span>
             </h1>
-            <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
-                Deploy VPS, dedicated servers, and managed applications in seconds. We handle the infrastructure so you can focus on your business. Enterprise-grade performance at startup prices.
+            <p class="max-w-2xl mb-8 text-gray-500 lg:mb-10 md:text-lg lg:text-xl dark:text-gray-400">
+                Linux administration, security hardening, network topology, CLI tooling, managed hosting — real hands-on experience across the full stack. Not a reseller. Not a dashboard with a logo on it.
             </p>
             <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
                 <a href="{% url 'services:pricing' %}" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
-                    View Pricing
-                    <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    See what we offer
+                    <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                 </a>
                 <a href="{% url 'home:about' %}" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
-                    Learn More
+                    About us
                 </a>
             </div>
-            
-            <!-- Trust Badges -->
-            <div class="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800 flex items-center gap-4 text-gray-500 text-sm font-medium">
-                <div class="flex items-center gap-1">
-                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                    99.9% Uptime
-                </div>
-                <div class="flex items-center gap-1">
-                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                    24/7 Support
-                </div>
-                <div class="flex items-center gap-1">
-                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                    Secure by Default
-                </div>
-            </div>
-        </div>
-        <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
-            <div class="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
-                <div class="h-[32px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[72px] rounded-l-lg"></div>
-                <div class="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
-                <div class="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
-                <div class="h-[64px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
-                <!-- Screen content -->
-                <div class="rounded-[2rem] overflow-hidden h-[572px] w-[272px] bg-gray-50 flex items-center justify-center">
-                    <div class="text-center p-4">
-                       <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0 1 1 0 002 0z"/>
-                        </svg>
-                       <p class="text-gray-500 text-sm">Mobile Dashboard Preview</p>
-                    </div>
-                </div>
+
+            <!-- Capability Tags -->
+            <div class="mt-10 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Linux</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">CLI tooling</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Security hardening</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Network topology</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Managed hosting</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Vibe coding</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Discord bots</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">Automation</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
+<!-- What We Actually Do -->
 <section class="bg-gray-50 dark:bg-gray-800 py-16">
-    <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-16">
-        <div class="text-center mb-16">
-            <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 lg:text-4xl dark:text-white">Designed for business teams like yours</h2>
-            <p class="font-light text-gray-500 sm:text-xl dark:text-gray-400">Everything you need to launch, scale, and manage your infrastructure.</p>
+    <div class="max-w-screen-xl px-4 mx-auto">
+        <div class="mb-12">
+            <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">What we actually do</h2>
+            <p class="mt-3 text-gray-500 dark:text-gray-400 max-w-2xl">Not just hosting. End-to-end technical work — from bare metal to the application layer.</p>
         </div>
-        
-        <div class="grid gap-8 md:grid-cols-3">
-            <!-- Feature 1 -->
-            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
-                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L8.586 10 5.293 6.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <!-- Linux & Servers -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                        <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L8.586 10 5.293 6.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-bold dark:text-white">Linux & CLI</h3>
                 </div>
-                <h3 class="mb-2 text-xl font-bold dark:text-white">Developer API</h3>
-                <p class="text-gray-500 dark:text-gray-400">Full REST API access to manage your resources programmatically. Automate deployments and scaling.</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Server provisioning, shell scripting, process management, systemd, cron, performance tuning. If it runs on Linux, we've touched it.</p>
             </div>
-            <!-- Feature 2 -->
-            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
-                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+
+            <!-- Security -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-bold dark:text-white">Security Hardening</h3>
                 </div>
-                <h3 class="mb-2 text-xl font-bold dark:text-white">Admin Dashboard</h3>
-                <p class="text-gray-500 dark:text-gray-400">Comprehensive control panel for user management, billing, and support tickets.</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Firewall rules, fail2ban, SSH lockdown, CSP, audit logs, vulnerability scanning. Security isn't an afterthought here.</p>
             </div>
-            <!-- Feature 3 -->
-            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900">
-                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+
+            <!-- Networking -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M13 7H7v6h6V7z"/><path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-bold dark:text-white">Network Topology</h3>
                 </div>
-                <h3 class="mb-2 text-xl font-bold dark:text-white">Automated Provisioning</h3>
-                <p class="text-gray-500 dark:text-gray-400">Instant setup for VPS and services. No waiting for manual approval.</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">LAN/VLAN setup, routing, DNS, reverse proxies, VPN tunnels, Prometheus/Alertmanager monitoring stacks.</p>
+            </div>
+
+            <!-- Managed Hosting -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                        <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z"/><path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z"/><path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold dark:text-white">Managed Hosting</h3>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">VPS hosting, automated provisioning, backups, monitoring. We run it so you don't have to deal with it.</p>
+            </div>
+
+            <!-- Coding & Automation -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-bold dark:text-white">Coding & Automation</h3>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Python, Django, REST APIs, Discord bots, data pipelines. We'll build whatever glues your stack together.</p>
+            </div>
+
+            <!-- Support -->
+            <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-.08.08-1.53-1.533A5.98 5.98 0 004 10c0 .954.223 1.856.619 2.657l1.54-1.54zm1.088-6.45A5.974 5.974 0 0110 4c.946 0 1.836.223 2.625.619l-1.562 1.562a4.006 4.006 0 00-2.183.078L7.86 4.721z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-bold dark:text-white">Actual Support</h3>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Ticket-based support from people who understand the problem — not a script reader. If it's broken we fix it.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Pricing Section -->
+<!-- Hosting Plans -->
+{% if plans %}
 <section class="bg-white dark:bg-gray-900 py-16">
-    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-        <div class="mx-auto max-w-screen-md text-center mb-8 lg:mb-12">
-            <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Flexible Plans</h2>
-            <p class="mb-5 font-light text-gray-500 sm:text-xl dark:text-gray-400">Choose the plan that fits your business needs.</p>
+    <div class="max-w-screen-xl px-4 mx-auto">
+        <div class="mb-12">
+            <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Hosting plans</h2>
+            <p class="mt-3 text-gray-500 dark:text-gray-400">Managed VPS with automated provisioning. Pick a size, we handle the rest.</p>
         </div>
         <div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
             {% for plan in plans %}
-            <!-- Pricing Card -->
-            <div class="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white w-full transform hover:scale-105 transition-transform duration-300">
+            <div class="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border {% if plan.is_featured %}border-primary-600 border-2{% else %}border-gray-200{% endif %} shadow dark:bg-gray-800 dark:text-white w-full hover:shadow-lg transition-shadow duration-300">
+                {% if plan.is_featured %}
+                <span class="inline-block mb-3 px-3 py-1 text-xs font-semibold text-primary-700 bg-primary-100 rounded-full dark:bg-primary-900 dark:text-primary-300 self-center">Most popular</span>
+                {% endif %}
                 <h3 class="mb-4 text-2xl font-semibold">{{ plan.name }}</h3>
-                <p class="font-light text-gray-500 sm:text-lg dark:text-gray-400">Best for {{ plan.slug|title }} Usage</p>
+                <p class="font-light text-gray-500 sm:text-lg dark:text-gray-400">{{ plan.description|default:"Managed VPS hosting" }}</p>
                 <div class="flex justify-center items-baseline my-8">
                     <span class="mr-2 text-5xl font-extrabold">${{ plan.price_monthly }}</span>
                     <span class="text-gray-500 dark:text-gray-400">/mo</span>
                 </div>
-                <!-- Features List -->
                 <ul role="list" class="mb-8 space-y-4 text-left">
                     {% for feature in plan.features.all %}
                     <li class="flex items-center space-x-3">
-                        <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        <span>{{ feature.text }}</span>
+                        <svg class="flex-shrink-0 w-5 h-5 {% if feature.is_included %}text-green-500 dark:text-green-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        <span {% if not feature.is_included %}class="text-gray-400 dark:text-gray-500" title="Not included in this plan — upgrade to unlock"{% endif %}>{{ feature.text }}</span>
                     </li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'orders:checkout' plan_slug=plan.slug %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900 mt-auto shadow-md hover:shadow-lg transition-shadow">
+                <a href="{% url 'orders:checkout' plan_slug=plan.slug %}" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 mt-auto shadow-md hover:shadow-lg transition-shadow">
                     Get started
                 </a>
             </div>
             {% endfor %}
         </div>
+        <p class="mt-8 text-center text-sm text-gray-400 dark:text-gray-500">All plans include a 14-day free trial. After the trial, we'll ask before charging anything.</p>
     </div>
 </section>
+{% endif %}
 
-<!-- Call to Action -->
+<!-- CTA -->
 <section class="bg-gray-50 dark:bg-gray-800">
-    <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+    <div class="py-12 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
         <div class="mx-auto max-w-screen-sm text-center">
-            <h2 class="mb-4 text-4xl tracking-tight font-extrabold leading-tight text-gray-900 dark:text-white">Start your free trial today</h2>
-            <p class="mb-6 font-light text-gray-500 dark:text-gray-400 md:text-lg">Try EZ Solutions Platform for 14 days. No credit card required.</p>
-            <a href="{% url 'account_signup' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">Sign Up Free</a>
+            <h2 class="mb-4 text-3xl tracking-tight font-extrabold leading-tight text-gray-900 dark:text-white">Work with people who actually know the stack</h2>
+            <p class="mb-2 text-gray-500 dark:text-gray-400 md:text-lg">Start with a free account. No credit card, no sales call, no pressure.</p>
+            <p class="mb-6 text-sm text-gray-400 dark:text-gray-500">After 14 days, we'll ask if you'd like to continue — no automatic charges.</p>
+            <a href="{% url 'account_signup' %}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">Create a free account</a>
         </div>
     </div>
 </section>
