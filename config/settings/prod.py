@@ -14,6 +14,13 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = "DENY"
 
+# CSRF trusted origins (add your real domain(s) here)
+CSRF_TRUSTED_ORIGINS = config(  # noqa: F405
+    "CSRF_TRUSTED_ORIGINS",
+    default="https://ez-solutions.com,https://www.ez-solutions.com",
+    cast=Csv(),  # noqa: F405
+)
+
 # Email via Anymail (Mailgun by default; configure MAILGUN_API_KEY in env)
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 ANYMAIL = {

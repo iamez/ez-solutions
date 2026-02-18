@@ -45,7 +45,7 @@ LOCAL_APPS = [
     "services.apps.ServicesConfig",
     "orders.apps.OrdersConfig",
     "tickets.apps.TicketsConfig",
-    "domains.apps.DomainsConfig",
+    # "domains.apps.DomainsConfig",  # Phase 3: re-enable when domain models are built
     "api.apps.ApiConfig",
     "home.apps.HomeConfig",
 ]

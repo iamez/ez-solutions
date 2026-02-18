@@ -12,7 +12,7 @@ addopts = [
 ]
 
 [tool.bandit]
-exclude_dirs = ["venv", ".venv", "tests", "ai_instructions_copilot_instructions_readme"]
+exclude_dirs = ["venv", ".venv", "tests", "docs"]
 skips = [
     "B101",   # assert is fine in tests (excluded separately)
     "B104",   # 0.0.0.0 in dev ALLOWED_HOSTS is intentional
@@ -28,7 +28,7 @@ exclude = [
     "migrations",
     "__pycache__",
     "staticfiles",
-    "ai_instructions_copilot_instructions_readme",
+    "docs",
 ]
 
 [tool.ruff.lint]
@@ -53,7 +53,7 @@ ignore = [
 "config/settings/*" = ["F401", "F403", "S105"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["users", "services", "orders", "tickets", "domains", "api", "home", "config"]
+known-first-party = ["users", "services", "orders", "tickets", "api", "home", "config"]
 
 [tool.black]
 line-length = 100
@@ -75,4 +75,6 @@ omit = [
     "manage.py",
     "config/settings/*",
     "*/tests/*",
+    "docs/*",
+    "domains/*",
 ]
