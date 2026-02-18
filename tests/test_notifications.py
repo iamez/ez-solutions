@@ -146,7 +146,7 @@ class TestTelegramChannel:
         ch = TelegramChannel()
         assert ch.send("999", "Hello", "World") is True
         call_args = mock_post.call_args
-        assert "api.telegram.org" in call_args[0][0]
+        assert call_args[0][0].startswith("https://api.telegram.org/bot")
         # Check parse_mode is HTML (after the security fix)
         assert call_args[1]["json"]["parse_mode"] == "HTML"
 

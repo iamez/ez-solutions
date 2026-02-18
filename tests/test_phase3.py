@@ -228,7 +228,7 @@ class TestBillingPortalView:
         client.force_login(user)
         resp = client.get(BILLING_PORTAL_URL)
         assert resp.status_code == 302
-        assert "stripe.com" in resp["Location"]
+        assert resp["Location"] == "https://billing.stripe.com/portal/xyz"
 
 
 # ---------------------------------------------------------------------------

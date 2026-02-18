@@ -191,8 +191,11 @@ class ReadinessCheckView(View):
 
             return JsonResponse({"status": "ready", "message": "Application is ready"}, status=200)
 
-        except Exception as e:
-            return JsonResponse({"status": "not_ready", "message": str(e)}, status=503)
+        except Exception:
+            return JsonResponse(
+                {"status": "not_ready", "message": "Internal readiness check failed"},
+                status=503,
+            )
 
 
 class LivenessCheckView(View):

@@ -5,14 +5,21 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-
-from .health import health_check
+from health_check.views import HealthCheckView
 
 urlpatterns = [
     # Admin
     path(config("ADMIN_URL", default="admin/"), admin.site.urls),
-    # Infrastructure health endpoint
-    path("ht/", health_check, name="health-check"),
+    # Infrastructure health endpoint (DB + migrations)
+    path(
+        "ht/",
+        HealthCheckView.as_view(
+            checks=[
+                "health_check.checks.Database",
+            ]
+        ),
+        name="health-check",
+    ),
     # Public pages
     path("", include("home.urls", namespace="home")),
     # Allauth (login, logout, register, email verification, password reset)
