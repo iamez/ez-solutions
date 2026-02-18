@@ -77,6 +77,7 @@ class TelegramChannel(NotificationChannel):
             return False
 
         import html as html_lib
+
         text = f"<b>{html_lib.escape(subject)}</b>\n\n{html_lib.escape(body)}"
         url = f"https://api.telegram.org/bot{token}/sendMessage"
         payload = {

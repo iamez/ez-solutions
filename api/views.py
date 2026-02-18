@@ -1,5 +1,6 @@
 """REST API views — versioned under /api/v1/."""
 
+from django.db import transaction
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -7,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
-from django.db import transaction
 from services.models import ServicePlan
 from tickets.models import Ticket, TicketMessage, TicketPriority, TicketStatus
 
@@ -27,6 +27,7 @@ class TicketCreateThrottle(UserRateThrottle):
 
 class JWTAuthThrottle(UserRateThrottle):
     scope = "jwt_auth"
+
 
 # ---------------------------------------------------------------------------
 # Health

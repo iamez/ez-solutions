@@ -15,5 +15,13 @@ class NotificationLogAdmin(admin.ModelAdmin):
     list_display = ("created_at", "channel", "subject", "recipient", "success")
     list_filter = ("channel", "success")
     search_fields = ("subject", "recipient")
-    readonly_fields = ("user", "channel", "subject", "recipient", "success", "error_message", "created_at")
+    readonly_fields = (
+        "user",
+        "channel",
+        "subject",
+        "recipient",
+        "success",
+        "error_message",
+        "created_at",
+    )
     date_hierarchy = "created_at"

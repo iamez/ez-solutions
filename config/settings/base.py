@@ -138,7 +138,10 @@ LOGIN_URL = "account_login"
 # ---------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -255,11 +258,29 @@ AXES_RESET_ON_SUCCESS = True
 # ---------------------------------------------------------------------------
 CSP_REPORT_ONLY = True
 CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com", "https://*.stripe.com",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com",)
-CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com",)
-CSP_IMG_SRC = ("'self'", "data:",)
-CSP_CONNECT_SRC = ("'self'", "https://*.stripe.com",)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "https://cdnjs.cloudflare.com",
+    "https://*.stripe.com",
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+    "https://cdnjs.cloudflare.com",
+    "https://fonts.googleapis.com",
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://fonts.gstatic.com",
+)
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://*.stripe.com",
+)
 
 # ---------------------------------------------------------------------------
 # Notifications — multi-channel (email + Telegram + Signal)

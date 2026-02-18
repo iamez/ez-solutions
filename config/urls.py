@@ -1,10 +1,10 @@
 """URL configuration for EZ Solutions."""
 
+from decouple import config
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from decouple import config
 
 from .health import health_check
 

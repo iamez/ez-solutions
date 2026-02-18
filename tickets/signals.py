@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 
 from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +30,7 @@ def on_ticket_message_created(sender, instance, created, **kwargs):
     else:
         # Notify admin/staff about customer reply
         from django.conf import settings
+
         recipient_email = settings.DEFAULT_FROM_EMAIL
 
     try:

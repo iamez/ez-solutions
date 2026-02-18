@@ -13,7 +13,13 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-@shared_task(autoretry_for=(Exception,), retry_backoff=True, max_retries=3, soft_time_limit=60, time_limit=120)
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    max_retries=3,
+    soft_time_limit=60,
+    time_limit=120,
+)
 def process_stripe_event(payment_event_id: int) -> None:
     from django.utils import timezone
 
@@ -44,13 +50,17 @@ def process_stripe_event(payment_event_id: int) -> None:
         payment_event.error_message = str(exc)[:2000]
         payment_event.processed_at = timezone.now()
         payment_event.save(update_fields=["status", "error_message", "processed_at"])
-        log.exception(
-            "Async webhook handler failed for event %s", payment_event.stripe_event_id
-        )
+        log.exception("Async webhook handler failed for event %s", payment_event.stripe_event_id)
         raise
 
 
-@shared_task(autoretry_for=(Exception,), retry_backoff=True, max_retries=3, soft_time_limit=60, time_limit=120)
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    max_retries=3,
+    soft_time_limit=60,
+    time_limit=120,
+)
 def send_checkout_success_email_task(user_id: int, plan_name: str) -> None:
     try:
         user = User.objects.get(pk=user_id)
@@ -65,7 +75,13 @@ def send_checkout_success_email_task(user_id: int, plan_name: str) -> None:
     )
 
 
-@shared_task(autoretry_for=(Exception,), retry_backoff=True, max_retries=3, soft_time_limit=60, time_limit=120)
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    max_retries=3,
+    soft_time_limit=60,
+    time_limit=120,
+)
 def send_subscription_canceled_email_task(user_id: int) -> None:
     try:
         user = User.objects.get(pk=user_id)
@@ -79,7 +95,13 @@ def send_subscription_canceled_email_task(user_id: int) -> None:
     )
 
 
-@shared_task(autoretry_for=(Exception,), retry_backoff=True, max_retries=3, soft_time_limit=60, time_limit=120)
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    max_retries=3,
+    soft_time_limit=60,
+    time_limit=120,
+)
 def send_welcome_email_task(user_id: int) -> None:
     from .emailing import send_welcome_email
 
@@ -95,7 +117,13 @@ def send_welcome_email_task(user_id: int) -> None:
     )
 
 
-@shared_task(autoretry_for=(Exception,), retry_backoff=True, max_retries=3, soft_time_limit=60, time_limit=120)
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    max_retries=3,
+    soft_time_limit=60,
+    time_limit=120,
+)
 def send_ticket_notification_task(ticket_id: int, message_id: int, recipient_email: str) -> None:
     from tickets.models import TicketMessage
 

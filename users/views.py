@@ -27,6 +27,7 @@ def dashboard(request):
     services = []
     if customer:
         from orders.models import VPSInstance
+
         services = VPSInstance.objects.filter(
             customer=customer,
             status__in=["running", "stopped", "provisioning"],

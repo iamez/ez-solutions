@@ -55,5 +55,5 @@ try:
             traces_sample_rate=0.2,
             send_default_pii=False,
         )
-except (ImportError, Exception):  # noqa: BLE001
+except (ImportError, Exception):  # noqa: BLE001, S110
     pass  # sentry-sdk not installed or config error

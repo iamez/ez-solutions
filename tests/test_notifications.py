@@ -4,9 +4,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory
 
-from notifications.channels import EmailChannel, SignalChannel, TelegramChannel, get_active_channels
+from notifications.channels import EmailChannel, SignalChannel, TelegramChannel
 from notifications.dispatch import _get_recipient, notify_admin, notify_user
 from notifications.models import NotificationLog, NotificationPreference
 
@@ -17,6 +16,7 @@ User = get_user_model()
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def user(db):
     return User.objects.create_user(email="notify@test.com", password="testpass123!")
@@ -24,7 +24,7 @@ def user(db):
 
 @pytest.fixture
 def user_with_prefs(user):
-    prefs = NotificationPreference.objects.create(
+    NotificationPreference.objects.create(
         user=user,
         email_enabled=True,
         telegram_enabled=True,
@@ -292,7 +292,9 @@ class TestTicketSignals:
         from tickets.models import Ticket, TicketMessage
 
         user = User.objects.create_user(email="customer@test.com", password="testpass123!")
-        staff = User.objects.create_user(email="staff@test.com", password="testpass123!", is_staff=True)
+        staff = User.objects.create_user(
+            email="staff@test.com", password="testpass123!", is_staff=True
+        )
         ticket = Ticket.objects.create(user=user, subject="Help me")
         TicketMessage.objects.create(
             ticket=ticket, sender=staff, body="We're on it!", is_staff_reply=True
@@ -338,11 +340,13 @@ class TestWelcomeSignal:
 class TestUnsubscribeViews:
     def test_preferences_requires_login(self, client):
         from django.urls import reverse
+
         resp = client.get(reverse("notifications:preferences"))
         assert resp.status_code == 302  # redirect to login
 
     def test_preferences_page_loads(self, client, user):
         from django.urls import reverse
+
         client.force_login(user)
         resp = client.get(reverse("notifications:preferences"))
         assert resp.status_code == 200
@@ -350,11 +354,15 @@ class TestUnsubscribeViews:
 
     def test_preferences_save(self, client, user):
         from django.urls import reverse
+
         client.force_login(user)
-        resp = client.post(reverse("notifications:preferences"), {
-            "email_enabled": "on",
-            "telegram_chat_id": "12345",
-        })
+        resp = client.post(
+            reverse("notifications:preferences"),
+            {
+                "email_enabled": "on",
+                "telegram_chat_id": "12345",
+            },
+        )
         assert resp.status_code == 302
         prefs = NotificationPreference.objects.get(user=user)
         assert prefs.email_enabled is True
@@ -363,6 +371,7 @@ class TestUnsubscribeViews:
 
     def test_unsubscribe_valid_token(self, client, user):
         from notifications.views import make_unsubscribe_token
+
         token = make_unsubscribe_token(user.pk)
         resp = client.get(f"/notifications/unsubscribe/{token}/")
         assert resp.status_code == 200
@@ -370,6 +379,7 @@ class TestUnsubscribeViews:
 
     def test_unsubscribe_post_disables_email(self, client, user):
         from notifications.views import make_unsubscribe_token
+
         NotificationPreference.objects.create(user=user, email_enabled=True)
         token = make_unsubscribe_token(user.pk)
         resp = client.post(f"/notifications/unsubscribe/{token}/")
@@ -391,6 +401,7 @@ class TestUnsubscribeViews:
 class TestSeedPlansCommand:
     def test_seed_creates_plans(self):
         from django.core.management import call_command
+
         from services.models import ServicePlan
 
         call_command("seed_plans")
@@ -398,6 +409,7 @@ class TestSeedPlansCommand:
 
     def test_seed_idempotent(self):
         from django.core.management import call_command
+
         from services.models import ServicePlan
 
         call_command("seed_plans")
@@ -408,6 +420,7 @@ class TestSeedPlansCommand:
 
     def test_seed_clear(self):
         from django.core.management import call_command
+
         from services.models import ServicePlan
 
         call_command("seed_plans")

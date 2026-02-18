@@ -113,6 +113,7 @@ def billing_portal(request):
 # Webhook
 # ---------------------------------------------------------------------------
 
+
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):

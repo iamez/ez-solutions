@@ -16,11 +16,10 @@ Usage:
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from django.conf import settings
 
-from .channels import CHANNELS, get_active_channels
+from .channels import get_active_channels
 
 log = logging.getLogger(__name__)
 
@@ -67,11 +66,24 @@ def notify_user(
         try:
             ok = channel.send(recipient, subject, body, html_body=html_body)
             results[name] = ok
-            _log_notification(user=user, channel=name, subject=subject, recipient=recipient, success=ok)
+            _log_notification(
+                user=user,
+                channel=name,
+                subject=subject,
+                recipient=recipient,
+                success=ok,
+            )
         except Exception as exc:
             log.exception("Channel '%s' failed for user %s", name, user.pk)
             results[name] = False
-            _log_notification(user=user, channel=name, subject=subject, recipient=recipient, success=False, error=str(exc))
+            _log_notification(
+                user=user,
+                channel=name,
+                subject=subject,
+                recipient=recipient,
+                success=False,
+                error=str(exc),
+            )
 
     return results
 
@@ -100,11 +112,24 @@ def notify_admin(
         try:
             ok = active[name].send(recipient, subject, body, html_body=html_body)
             results[name] = ok
-            _log_notification(user=None, channel=name, subject=subject, recipient=recipient, success=ok)
+            _log_notification(
+                user=None,
+                channel=name,
+                subject=subject,
+                recipient=recipient,
+                success=ok,
+            )
         except Exception as exc:
             log.exception("Admin channel '%s' failed", name)
             results[name] = False
-            _log_notification(user=None, channel=name, subject=subject, recipient=recipient, success=False, error=str(exc))
+            _log_notification(
+                user=None,
+                channel=name,
+                subject=subject,
+                recipient=recipient,
+                success=False,
+                error=str(exc),
+            )
 
     return results
 
@@ -129,6 +154,7 @@ def _log_notification(
     """Write a NotificationLog entry (fire-and-forget; never raise)."""
     try:
         from .models import NotificationLog
+
         NotificationLog.objects.create(
             user=user,
             channel=channel,

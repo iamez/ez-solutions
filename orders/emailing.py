@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from django.utils import timezone
-
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 
 def _site_url() -> str:
@@ -15,7 +14,9 @@ def _unsubscribe_url(user_email: str) -> str:
     """Generate unsubscribe URL. Falls back to preferences page if no user found."""
     try:
         from django.contrib.auth import get_user_model
+
         from notifications.views import make_unsubscribe_token
+
         User = get_user_model()
         user = User.objects.get(email=user_email)
         token = make_unsubscribe_token(user.pk)

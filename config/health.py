@@ -18,9 +18,7 @@ def health_check(request):
     try:
         import redis as redis_lib
 
-        r = redis_lib.Redis.from_url(
-            getattr(settings, "CELERY_BROKER_URL", ""), socket_timeout=2
-        )
+        r = redis_lib.Redis.from_url(getattr(settings, "CELERY_BROKER_URL", ""), socket_timeout=2)
         r.ping()
         checks["redis"] = "ok"
     except ImportError:
