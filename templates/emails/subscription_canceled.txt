@@ -1,0 +1,8 @@
+Hi {{ name }},
+
+Your EZ Solutions subscription has been moved to the free tier.
+
+If this was unexpected, please contact support and we can help.
+
+Thanks,
+EZ Solutions

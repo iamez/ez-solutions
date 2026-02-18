@@ -46,6 +46,7 @@ def _handle_checkout_completed(session: dict) -> None:
 
     plan_slug = session.get("metadata", {}).get("plan_slug", "")
     _update_user_tier(customer.user, plan_slug)
+    _queue_checkout_success_email(customer.user.pk, _resolve_plan_name(plan_slug))
 
 
 def _handle_subscription_change(subscription: dict) -> None:
@@ -55,12 +56,18 @@ def _handle_subscription_change(subscription: dict) -> None:
     except Customer.DoesNotExist:
         return
 
+    existing = Subscription.objects.filter(
+        stripe_subscription_id=subscription.get("id", ""),
+    ).first()
+    previous_status = existing.status if existing else ""
     _upsert_subscription(customer, subscription)
 
     new_status = subscription.get("status", "")
     if new_status in ("canceled", "unpaid", "incomplete_expired"):
         customer.user.subscription_tier = SubscriptionTier.FREE  # type: ignore[attr-defined]
         customer.user.save(update_fields=["subscription_tier"])
+        if previous_status != new_status:
+            _queue_subscription_canceled_email(customer.user.pk)
 
 
 def _upsert_subscription(customer: Customer, stripe_sub: dict) -> Subscription:
@@ -104,3 +111,33 @@ def _update_user_tier(user, plan_slug: str) -> None:
     if new_tier:
         user.subscription_tier = new_tier
         user.save(update_fields=["subscription_tier"])
+
+
+def _resolve_plan_name(plan_slug: str) -> str:
+    if not plan_slug:
+        return "Your selected plan"
+    try:
+        plan = ServicePlan.objects.get(slug=plan_slug)
+        return plan.name
+    except ServicePlan.DoesNotExist:
+        return plan_slug.replace("-", " ").title()
+
+
+def _queue_checkout_success_email(user_id: int, plan_name: str) -> None:
+    from .tasks import send_checkout_success_email_task
+
+    try:
+        send_checkout_success_email_task.apply_async(args=[user_id, plan_name], ignore_result=True)
+    except Exception:  # noqa: BLE001
+        log.exception("Email enqueue failed for user %s; sending synchronously", user_id)
+        send_checkout_success_email_task.run(user_id, plan_name)
+
+
+def _queue_subscription_canceled_email(user_id: int) -> None:
+    from .tasks import send_subscription_canceled_email_task
+
+    try:
+        send_subscription_canceled_email_task.apply_async(args=[user_id], ignore_result=True)
+    except Exception:  # noqa: BLE001
+        log.exception("Cancel email enqueue failed for user %s; sending synchronously", user_id)
+        send_subscription_canceled_email_task.run(user_id)

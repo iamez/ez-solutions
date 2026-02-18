@@ -1,0 +1,10 @@
+Hi {{ name }},
+
+Your subscription is now active on EZ Solutions.
+
+Plan: {{ plan_name }}
+
+You can manage billing anytime from your dashboard billing portal.
+
+Thanks,
+EZ Solutions

@@ -11,7 +11,11 @@ import pytest
 from django.urls import reverse
 
 from orders.models import Customer, PaymentEvent, Subscription, SubscriptionStatus
-from orders.tasks import process_stripe_event
+from orders.tasks import (
+    process_stripe_event,
+    send_checkout_success_email_task,
+    send_subscription_canceled_email_task,
+)
 from services.models import ServicePlan
 from users.models import SubscriptionTier
 
@@ -336,3 +340,23 @@ class TestStripeWebhook:
 
         user.refresh_from_db()
         assert user.subscription_tier == SubscriptionTier.FREE
+
+
+@pytest.mark.django_db
+class TestTransactionalEmailTasks:
+    @patch("orders.tasks.send_checkout_success_email")
+    def test_checkout_success_email_task(self, mock_send, user):
+        send_checkout_success_email_task(user.pk, "Starter")
+        mock_send.assert_called_once_with(
+            user_email=user.email,
+            first_name=user.first_name,
+            plan_name="Starter",
+        )
+
+    @patch("orders.tasks.send_subscription_canceled_email")
+    def test_subscription_canceled_email_task(self, mock_send, user):
+        send_subscription_canceled_email_task(user.pk)
+        mock_send.assert_called_once_with(
+            user_email=user.email,
+            first_name=user.first_name,
+        )
